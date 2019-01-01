@@ -35,8 +35,8 @@ def btn_execute_action(event):
         # 数値変換(float, int)
         widthDivision = float(txt_widthDiv.get())
         widthCount = int(txt_widthCnt.get())
-        depthDivision = float(txt_widthDiv.get())
-        depthCount = int(txt_widthCnt.get())
+        depthDivision = float(txt_depthDiv.get())
+        depthCount = int(txt_depthCnt.get())
 
         # チェックボックスモノは
         # BooleanVarオブジェクトからgetして
