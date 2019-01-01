@@ -2,6 +2,7 @@
 import sys
 import tkinter
 from tkinter import colorchooser
+from tkinter import messagebox
 import numpy as np
 import colorsys
 import pers_grid_exec
@@ -34,6 +35,7 @@ def btn_saveSetting_action():
                    'btn_color': btn_color.cget('foreground')}           # String
         saveSetting(section, setting)
         print("設定値を保存しました。")
+        messagebox.showinfo('設定値保存','設定値を保存しました。')
 
 # パースガイド画像生成 実行
 def btn_execute_action(event):
