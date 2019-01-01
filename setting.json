@@ -1,14 +1,14 @@
 {
     "horz_plane_pers_grid": {
-        "txt_baseAz": "155.0",
-        "txt_D": "16.0",
+        "txt_baseAz": "180",
+        "txt_D": "10",
         "txt_W": "-30.0",
-        "txt_H": "-180,-120,-60,3.3,6.6",
+        "txt_H": "-210, -180, -150, -120, -90, -60, -30, -20, -10, -5",
         "txt_widthDiv": "10.0",
         "txt_widthCnt": "7",
         "txt_depthDiv": "10.0",
         "txt_depthCnt": "4",
-        "chkVal_drawObjPoint": true,
+        "chkVal_drawObjPoint": false,
         "chkVal_drawAzEvGrid": true,
         "chkVal_guideColor": false,
         "btn_color": "#0000ff"
