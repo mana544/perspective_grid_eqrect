@@ -5,6 +5,7 @@ from tkinter import colorchooser
 import numpy as np
 import colorsys
 import pers_grid_exec
+from mana544Lib import loadSetting, saveSetting
 
 # メインウインドウ生成
 root = tkinter.Tk()
@@ -15,6 +16,24 @@ root.resizable(False,False)     #ウィンドウサイズ変更の禁止　(x,y)
 # ★★★★★★★★★
 # ★ アクション ★
 # ★★★★★★★★★
+# 「設定値保存」ボタン
+def btn_saveSetting_action():
+        # 保存するjsonセクションと設定値dictを定義
+        section="horz_plane_pers_grid"
+        setting = {'txt_baseAz': txt_baseAz.get(),      # String
+                   'txt_D': txt_D.get(),                # String
+                   'txt_W': txt_W.get(),                # String
+                   'txt_H': txt_H.get(),                # String
+                   'txt_widthDiv': txt_widthDiv.get(),  # String
+                   'txt_widthCnt': txt_widthCnt.get(),  # String
+                   'txt_depthDiv': txt_depthDiv.get(),  # String
+                   'txt_depthCnt': txt_depthCnt.get(),  # String
+                   'chkVal_drawObjPoint': chkVal_drawObjPoint.get(),    # Boolean
+                   'chkVal_drawAzEvGrid': chkVal_drawAzEvGrid.get(),    # Boolean
+                   'chkVal_guideColor': chkVal_guideColor.get(),        # Boolean
+                   'btn_color': btn_color.cget('foreground')}           # String
+        saveSetting(section, setting)
+        print("設定値を保存しました。")
 
 # パースガイド画像生成 実行
 def btn_execute_action(event):
@@ -83,6 +102,9 @@ def btn_color_reDraw():
         # print("チェックが切れてます")
         btn_color.config(state='disable')
 
+# 初期設定値をsetting.jsonから読み込む
+setting = loadSetting('horz_plane_pers_grid')
+
 # ★★★★★★★★★★★★★★★
 # ★ スタティックテキスト ★
 # ★★★★★★★★★★★★★★★
@@ -108,14 +130,14 @@ txtVal_widthDiv = tkinter.StringVar()
 txtVal_widthCnt = tkinter.StringVar()
 txtVal_depthDiv = tkinter.StringVar()
 txtVal_depthCnt = tkinter.StringVar()
-txtVal_baseAz.set('155.0')
-txtVal_D.set('16.0')
-txtVal_W.set('-30.0')
-txtVal_H.set('-180,-120,-60,3.3,6.6')
-txtVal_widthDiv.set('10.0')
-txtVal_widthCnt.set('7')
-txtVal_depthDiv.set('10.0')
-txtVal_depthCnt.set('4')
+txtVal_baseAz.set(setting['txt_baseAz'])
+txtVal_D.set(setting['txt_D'])
+txtVal_W.set(setting['txt_W'])
+txtVal_H.set(setting['txt_H'])
+txtVal_widthDiv.set(setting['txt_widthDiv'])
+txtVal_widthCnt.set(setting['txt_widthCnt'])
+txtVal_depthDiv.set(setting['txt_depthDiv'])
+txtVal_depthCnt.set(setting['txt_depthCnt'])
 
 txt_baseAz = tkinter.Entry(width=10, justify='left', textvariable=txtVal_baseAz)
 txt_D = tkinter.Entry(width=5, justify='left', textvariable=txtVal_D)
@@ -131,11 +153,11 @@ txt_depthCnt = tkinter.Entry(width=5, justify='left', textvariable=txtVal_depthC
 # ★★★★★★★★★★★★★
 # チェックボックス用変数
 chkVal_drawObjPoint = tkinter.BooleanVar()
-chkVal_drawObjPoint.set(True)
+chkVal_drawObjPoint.set(setting['chkVal_drawObjPoint'])
 chkVal_drawAzEvGrid = tkinter.BooleanVar()
-chkVal_drawAzEvGrid.set(True)
+chkVal_drawAzEvGrid.set(setting['chkVal_drawAzEvGrid'])
 chkVal_guideColor = tkinter.BooleanVar()
-chkVal_guideColor.set(False)
+chkVal_guideColor.set(setting['chkVal_guideColor'])
 # chk_drawObjPoint = tkinter.Checkbutton(text=u"OPの“点”を描画する" , variable=Val1, state='disabled')
 chk_drawObjPoint = tkinter.Checkbutton(text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
 chk_drawAzEvGrid = tkinter.Checkbutton(text=u"正方グリッドを描画する" , variable=chkVal_drawAzEvGrid)
@@ -144,9 +166,9 @@ chk_guideColor = tkinter.Checkbutton(text=u"パースガイドの色" , variable
 # ★★★★★★★
 # ★ ボタン ★
 # ★★★★★★★
-btn_color = tkinter.Button(text=u'━━━', justify='left', foreground='#ff0000', command=btn_color_action)
+btn_color = tkinter.Button(text=u'━━━', justify='left', foreground=setting['btn_color'], command=btn_color_action)
 btn_execute = tkinter.Button(text=u'パースガイド画像生成', justify='left')
-
+btn_saveSetting = tkinter.Button(text=u'設定値保存', command=btn_saveSetting_action)
 
 # ★★★★★★★★
 # ★ イベント ★
@@ -179,7 +201,8 @@ chk_drawObjPoint.grid(row=9, column=0, columnspan=5, sticky='W')
 chk_drawAzEvGrid.grid(row=10, column=0, columnspan=5, sticky='W')
 chk_guideColor.grid(row=11, column=0, columnspan=4, sticky='W')
 btn_color.grid(row=11, column=4, sticky='W')
-btn_execute.grid(row=12, column=0, columnspan=5, sticky='W')
+btn_execute.grid(row=13, column=0, columnspan=5, sticky='E')
+btn_saveSetting.grid(row=12, column=0, columnspan=5, sticky='W')
 
 
 # ★★★★★★★

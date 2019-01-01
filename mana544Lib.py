@@ -2,6 +2,58 @@
 import numpy as np
 import colorsys
 import copy
+import json
+
+
+def saveSetting(section, setting):
+    '''
+    設定ファイル(setting.json)に内容を保存する。
+    
+    Parameters
+    ----------
+    section : str
+        何のセクションを読み取るか？
+        水平パースガイド生成 : 'horz_plane_pers_grid'
+    setting : dict
+        設定情報。
+        キーや内容はセクションによって異なります。
+
+    Returns
+    -------
+    None
+    '''
+    with open('setting.json') as f:
+        json_setting = json.load(f)
+
+    json_setting[section] = setting
+
+    with open('setting.json', 'w') as f:
+        json.dump(json_setting, f, indent=4)
+
+
+def loadSetting(section):
+    '''
+    設定ファイル(setting.json)から読み取って、内容を返す。
+    
+    Parameters
+    ----------
+    section : str
+        何のセクションを読み取るか？
+        水平パースガイド生成 : 'horz_plane_pers_grid'
+
+    Returns
+    -------
+    setting : dict
+        設定情報。
+        キーや内容はセクションによって異なります。
+    '''
+    with open('setting.json') as f:
+        setting = json.load(f)
+
+    # print(type(setting))
+
+    return setting[section]
+
 
 def createcolor(num:int, s=1.0, v=1.0):
     '''
