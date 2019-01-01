@@ -27,11 +27,11 @@ Photoshop等のペイントソフトにレイヤーとしてすぐに読み込�
 ### "setting_horz_plane_pers_grid.py"を呼び出す
 "setting_horz_plane_pers_grid.py"を呼び出すと、
 以下のようなGUI設定画面が立ち上がります。
-![水平パースガイド生成](img\setting_horz_plane_pers_grid.png)
+![水平パースガイド生成](img/setting_horz_plane_pers_grid.png)
 
 ### 設定値の入力
 設定値については、以下の概念図も併せてご覧下さい。  
-![水平パースガイド概念図](img\abstract.png)
+![水平パースガイド概念図](img/abstract.png)
 
 説明で頻繁に出てくる“ベースObject Point(Base OP)”とは、
 パース面生成の基点となるOPのことで、図中の黒塗り潰しの点のことを指します。  
