@@ -8,10 +8,10 @@
         "txt_widthCnt": "7",
         "txt_depthDiv": "10.0",
         "txt_depthCnt": "4",
-        "chkVal_drawObjPoint": false,
+        "chkVal_drawObjPoint": true,
         "chkVal_drawAzEvGrid": true,
         "chkVal_guideColor": false,
-        "btn_color": "#0000ff"
+        "btn_color": "#ff0000"
     },
     "vert_plane_pers_grid": {
         "txt_baseAz": "180.0",
