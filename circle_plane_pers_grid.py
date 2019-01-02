@@ -38,10 +38,10 @@ centerPoint : objectPoint
 '''
 # ▼▼▼ 設定値ココカラ ▼▼▼
 sphR = 1.5 * 1000
-circleR = 5
 centerPoint = objectPoint()
 centerPoint.Az = 180
-centerPoint.Ev = 0
+centerPoint.Ev = 88.9
+circleR = (50,)
 # ▲▲▲ 設定値ココマデ ▲▲▲
 
 
@@ -168,10 +168,16 @@ def calc_circlePoint(centerPoint, circleR):
     circlePoint_list : (objectPoint, ...)
         円を描画するポイントリスト
     """
-    point_theta = range(0, 361, 10)
+    point_theta = range(0, 361, 90)
     vert_circlePoint = []
     rel_circlePoint = []
     circlePoint = []
+    
+    '''
+    やること
+    np.array型でベクトル演算して、処理の高速化
+    描画の位置からEvが±90度に近いほど、あるいはD<0がある場合、描画間隔を狭める
+    '''
     for i in range(0,len(point_theta)):
         # vert面[W, H]に円を割り付け
         vert_circlePoint.append(objectPoint())
@@ -192,7 +198,10 @@ def calc_circlePoint(centerPoint, circleR):
         circlePoint[i].D = centerPoint.D + rel_circlePoint[i].D
         circlePoint[i].H = centerPoint.H + rel_circlePoint[i].H
         circlePoint[i].baseAz = centerPoint.baseAz
-        print("circlePoint[%u]: [%f, %f, %f]" % (i, circlePoint[i].D, circlePoint[i].H, circlePoint[i].W))
+        # print("circlePoint[%u]: [%f, %f, %f]" % (i, circlePoint[i].D, circlePoint[i].H, circlePoint[i].W))
+
+        circlePoint[i].rect2sph()
+        print("circlePoint[%u][Ev]: %f" % (i, circlePoint[i].Ev))
     
     return circlePoint
 
@@ -213,7 +222,6 @@ centerPoint.W = 0.0
 print("centerPoint: [%.2f, %.2f, %.2f]" % (centerPoint.D, centerPoint.H, centerPoint.W))
 
 
-circleR = (50, 100, 250, 500, 800)
 CP_list = []
 for i in range(len(circleR)):
     CP_list.append(calc_circlePoint(centerPoint, circleR[i]))
