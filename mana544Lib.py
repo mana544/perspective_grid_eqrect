@@ -14,6 +14,8 @@ def saveSetting(section, setting):
     section : str
         何のセクションを読み取るか？
         水平パースガイド生成 : 'horz_plane_pers_grid'
+        垂直パースガイド生成 : 'vert_plane_pers_grid'
+
     setting : dict
         設定情報。
         キーや内容はセクションによって異なります。
@@ -40,6 +42,7 @@ def loadSetting(section):
     section : str
         何のセクションを読み取るか？
         水平パースガイド生成 : 'horz_plane_pers_grid'
+        垂直パースガイド生成 : 'vert_plane_pers_grid'
 
     Returns
     -------

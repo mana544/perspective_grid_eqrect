@@ -1,9 +1,9 @@
 {
     "horz_plane_pers_grid": {
-        "txt_baseAz": "180",
-        "txt_D": "10",
+        "txt_baseAz": "180.0",
+        "txt_D": "10.0",
         "txt_W": "-30.0",
-        "txt_H": "-210, -180, -150, -120, -90, -60, -30, -20, -10, -5",
+        "txt_H": "-60, -30, -5, 12.5",
         "txt_widthDiv": "10.0",
         "txt_widthCnt": "7",
         "txt_depthDiv": "10.0",
@@ -12,5 +12,20 @@
         "chkVal_drawAzEvGrid": true,
         "chkVal_guideColor": false,
         "btn_color": "#0000ff"
+    },
+    "vert_plane_pers_grid": {
+        "txt_baseAz": "180.0",
+        "txt_baseEv": "30.0",
+        "txt_D": "10.0",
+        "txt_H": "5.0",
+        "txt_W": "0.0",
+        "txt_widthDiv": "1.0",
+        "txt_widthCnt": "4",
+        "txt_heightDiv": "1.0",
+        "txt_heightCnt": "7",
+        "chkVal_drawObjPoint": false,
+        "chkVal_drawAzEvGrid": false,
+        "chkVal_guideColor": true,
+        "btn_color": "#000000"
     }
 }
