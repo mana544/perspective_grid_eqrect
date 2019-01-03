@@ -12,8 +12,10 @@ from mana544Lib import loadSetting, saveSetting
 # メインウインドウ生成
 root = tkinter.Tk()
 root.title(u"水平パースガイド生成")
-root.geometry("300x400")
+# root.geometry("300x400")
 root.resizable(False,False)     #ウィンドウサイズ変更の禁止　(x,y)・・・False：禁止　True：許可
+frm = ttk.Frame(root)
+frm.grid(column=0, row=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
 
 # ★★★★★★★★★
 # ★ アクション ★
@@ -117,16 +119,16 @@ style.configure("btn_color.TButton", foreground=setting['btn_color'])
 # ★★★★★★★★★★★★★★★
 # ★ スタティックテキスト ★
 # ★★★★★★★★★★★★★★★
-Static01 = ttk.Label(text=u'水平パースガイド生成', justify='left', font=('',14))
-Static02 = ttk.Label(text=u'ベースAz', justify='left')
-Static03 = ttk.Label(text=u'ベースObject Point', justify='left')
-Static04 = ttk.Label(text=u'D', justify='left')
-Static05 = ttk.Label(text=u'W', justify='left')
-Static06 = ttk.Label(text=u'H', justify='left')
-Static07 = ttk.Label(text=u'Width Division', justify='left')
-Static08 = ttk.Label(text=u'Width Count', justify='left')
-Static09 = ttk.Label(text=u'Depth Division', justify='left')
-Static10 = ttk.Label(text=u'Depth Count', justify='left')
+Static01 = ttk.Label(frm, text=u'水平パースガイド生成', justify='left', font=('',14))
+Static02 = ttk.Label(frm, text=u'ベースAz', justify='left')
+Static03 = ttk.Label(frm, text=u'ベースObject Point', justify='left')
+Static04 = ttk.Label(frm, text=u'D', justify='left')
+Static05 = ttk.Label(frm, text=u'W', justify='left')
+Static06 = ttk.Label(frm, text=u'H', justify='left')
+Static07 = ttk.Label(frm, text=u'Width Division', justify='left')
+Static08 = ttk.Label(frm, text=u'Width Count', justify='left')
+Static09 = ttk.Label(frm, text=u'Depth Division', justify='left')
+Static10 = ttk.Label(frm, text=u'Depth Count', justify='left')
 
 # ★★★★★★★★★★★★★★
 # ★ インプットテキスト ★
@@ -148,14 +150,14 @@ txtVal_widthCnt.set(setting['txt_widthCnt'])
 txtVal_depthDiv.set(setting['txt_depthDiv'])
 txtVal_depthCnt.set(setting['txt_depthCnt'])
 
-txt_baseAz = ttk.Entry(width=10, justify='left', textvariable=txtVal_baseAz)
-txt_D = ttk.Entry(width=5, justify='left', textvariable=txtVal_D)
-txt_W = ttk.Entry(width=5, justify='left', textvariable=txtVal_W)
-txt_H = ttk.Entry(width=18, justify='left', textvariable=txtVal_H)
-txt_widthDiv = ttk.Entry(width=10, justify='left', textvariable=txtVal_widthDiv)
-txt_widthCnt = ttk.Entry(width=5, justify='left', textvariable=txtVal_widthCnt)
-txt_depthDiv = ttk.Entry(width=10, justify='left', textvariable=txtVal_depthDiv)
-txt_depthCnt = ttk.Entry(width=5, justify='left', textvariable=txtVal_depthCnt)
+txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
+txt_D = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_D)
+txt_W = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_W)
+txt_H = ttk.Entry(frm, width=18, justify='left', textvariable=txtVal_H)
+txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
+txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
+txt_depthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_depthDiv)
+txt_depthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_depthCnt)
 
 # ★★★★★★★★★★★★★
 # ★ チェックボックス ★
@@ -168,16 +170,16 @@ chkVal_drawObjPoint.set(setting['chkVal_drawObjPoint'])
 chkVal_drawAzEvGrid.set(setting['chkVal_drawAzEvGrid'])
 chkVal_guideColor.set(setting['chkVal_guideColor'])
 # chk_drawObjPoint = tkinter.Checkbutton(text=u"OPの“点”を描画する" , variable=Val1, state='disabled')
-chk_drawObjPoint = ttk.Checkbutton(text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
-chk_drawAzEvGrid = ttk.Checkbutton(text=u"正方グリッドを描画する" , variable=chkVal_drawAzEvGrid)
-chk_guideColor = ttk.Checkbutton(text=u"パースガイドの色" , variable=chkVal_guideColor, command=chk_guideColor_action)
+chk_drawObjPoint = ttk.Checkbutton(frm, text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
+chk_drawAzEvGrid = ttk.Checkbutton(frm, text=u"正方グリッドを描画する" , variable=chkVal_drawAzEvGrid)
+chk_guideColor = ttk.Checkbutton(frm, text=u"パースガイドの色" , variable=chkVal_guideColor, command=chk_guideColor_action)
 
 # ★★★★★★★
 # ★ ボタン ★
 # ★★★★★★★
-btn_color = ttk.Button(text=u'━━━', style='btn_color.TButton', command=btn_color_action)
-btn_execute = ttk.Button(text=u'パースガイド画像生成')
-btn_saveSetting = ttk.Button(text=u'設定値保存', command=btn_saveSetting_action)
+btn_color = ttk.Button(frm, text=u'━━━', style='btn_color.TButton', command=btn_color_action)
+btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
+btn_saveSetting = ttk.Button(frm, text=u'設定値保存', command=btn_saveSetting_action)
 
 # ★★★★★★★★
 # ★ イベント ★
