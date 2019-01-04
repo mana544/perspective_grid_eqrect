@@ -40,7 +40,7 @@ centerPoint : objectPoint
 sphR = 1.5 * 1000
 centerPoint = objectPoint()
 centerPoint.Az = 180
-centerPoint.Ev = 88.9
+centerPoint.Ev = 85.9
 circleR = (50,)
 # ▲▲▲ 設定値ココマデ ▲▲▲
 
@@ -168,40 +168,40 @@ def calc_circlePoint(centerPoint, circleR):
     circlePoint_list : (objectPoint, ...)
         円を描画するポイントリスト
     """
-    point_theta = range(0, 361, 90)
-    vert_circlePoint = []
-    rel_circlePoint = []
-    circlePoint = []
-    
     '''
     やること
-    np.array型でベクトル演算して、処理の高速化
     描画の位置からEvが±90度に近いほど、あるいはD<0がある場合、描画間隔を狭める
     '''
+    # 円を形成する点の数(角度)
+    circlePoint_deg = 1.0
+    point_theta = np.arange(0.0, 360.1, circlePoint_deg)
+
+    # vert面[W, H]に円を割り付け
+    W = circleR * np.cos(np.deg2rad(point_theta))
+    H = circleR * np.sin(np.deg2rad(point_theta))
+
+    # vert面の円をEv分傾ける
+    cntPoint_sin = np.sin(np.deg2rad(centerPoint.Ev))
+    cntPoint_cos = np.cos(np.deg2rad(centerPoint.Ev))
+    H = H * cntPoint_cos
+    D = -1 * H * cntPoint_sin
+
+    # 円の座標[D, H, W]を求める
+    W = centerPoint.W + W
+    D = centerPoint.D + D
+    H = centerPoint.H + H
+
+    # point_thetaの数だけcirclePoint(objectPointクラスのリスト)を作る
+    circlePoint = []
     for i in range(0,len(point_theta)):
-        # vert面[W, H]に円を割り付け
-        vert_circlePoint.append(objectPoint())
-        vert_circlePoint[i].W = circleR * np.cos(np.deg2rad(point_theta[i]))
-        vert_circlePoint[i].H = circleR * np.sin(np.deg2rad(point_theta[i]))
-        # print("vert_Point[%u]: [%f, %f, %f]" % (i, vert_circlePoint[i].D, vert_circlePoint[i].H, vert_circlePoint[i].W))
-
-        # vert面の円をEv分傾ける
-        rel_circlePoint.append(objectPoint())
-        rel_circlePoint[i].W = vert_circlePoint[i].W
-        rel_circlePoint[i].H = vert_circlePoint[i].H * np.cos(np.deg2rad(centerPoint.Ev))
-        rel_circlePoint[i].D = - vert_circlePoint[i].H * np.sin(np.deg2rad(centerPoint.Ev))
-        # print("rel_Point[%u]: [%f, %f, %f]" % (i, rel_circlePoint[i].D, rel_circlePoint[i].H, rel_circlePoint[i].W))
-
-        # 円の座標[D, H, W]を求める
         circlePoint.append(objectPoint())
-        circlePoint[i].W = centerPoint.W + rel_circlePoint[i].W
-        circlePoint[i].D = centerPoint.D + rel_circlePoint[i].D
-        circlePoint[i].H = centerPoint.H + rel_circlePoint[i].H
+        circlePoint[i].W = W[i]
+        circlePoint[i].D = D[i]
+        circlePoint[i].H = H[i]
         circlePoint[i].baseAz = centerPoint.baseAz
-        # print("circlePoint[%u]: [%f, %f, %f]" % (i, circlePoint[i].D, circlePoint[i].H, circlePoint[i].W))
 
         circlePoint[i].rect2sph()
-        print("circlePoint[%u][Ev]: %f" % (i, circlePoint[i].Ev))
+        # print("circlePoint[%u][Ev]: %f" % (i, circlePoint[i].Ev))
     
     return circlePoint
 
