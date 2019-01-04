@@ -5,7 +5,7 @@ from mana544Lib import createcolor, listprint, heightLayer, objectPoint
 import matplotlib.pyplot as plt
 
 '''
-正距円筒図法に則って、正円を計算します。
+正距円筒図法に則って、正円(同心円)を計算します。
 【注意】
 このプログラムはそもそも展開用に書いたものではないので、ドキュメント等
 はありません(書く予定もありません)。従って、備忘録的に書いた各関数の
@@ -28,8 +28,9 @@ sphR : float
     全天球の半径 [m](1000かけて[mm]にする)
 point_theta : list(int, ...)
     円を描画するときの“点”を角度で指定
-circleR : float
+circleR : tuple(float, float...)
     円の半径 [mm]
+    タプルで複数の半径を指定すると、同心円を描画します。
 centerPoint : objectPoint
     円の中心座標を[Az, Ev]で指定
     .Az = 180
@@ -40,8 +41,8 @@ centerPoint : objectPoint
 sphR = 1.5 * 1000
 centerPoint = objectPoint()
 centerPoint.Az = 180
-centerPoint.Ev = 85.9
-circleR = (50,)
+centerPoint.Ev = 60.0
+circleR = (100,200,300,400,500)
 # ▲▲▲ 設定値ココマデ ▲▲▲
 
 
@@ -146,7 +147,7 @@ def createImage(CP_list, drawAzEvGrid, color):
     im.putalpha(im_a)
 
     # filename = ("vertPersGuide(%g).png" % bseObjPoint[0])
-    filename = ("vertPersGuide.png")
+    filename = ("circlePersGuide.png")
     im.save(filename)
     print("%s 生成完了" % filename)
 
@@ -168,31 +169,27 @@ def calc_circlePoint(centerPoint, circleR):
     circlePoint_list : (objectPoint, ...)
         円を描画するポイントリスト
     """
-    '''
-    やること
-    描画の位置からEvが±90度に近いほど、あるいはD<0がある場合、描画間隔を狭める
-    '''
     # 円を形成する点の数(角度)
-    circlePoint_deg = 30.0
+    circlePoint_deg = 1.0
     point_theta = np.arange(0.0, 360.1, circlePoint_deg)
 
     # vert面[W, H]に円を割り付け
     W = circleR * np.cos(np.deg2rad(point_theta))
     H = circleR * np.sin(np.deg2rad(point_theta))
-    print("vert_W:")
-    print(W)
-    print("vert_H:")
-    print(H)
+    # print("vert_W:")
+    # print(W)
+    # print("vert_H:")
+    # print(H)
 
     # vert面の円をEv分傾ける
     cntPoint_sin = np.sin(np.deg2rad(centerPoint.Ev))
     cntPoint_cos = np.cos(np.deg2rad(centerPoint.Ev))
-    H = H * cntPoint_cos
     D = -1 * H * cntPoint_sin
-    print("rel_H:")
-    print(H)
-    print("rel_D:")
-    print(D)
+    H = H * cntPoint_cos
+    # print("rel_H:")
+    # print(H)
+    # print("rel_D:")
+    # print(D)
 
     # 円の座標[D, H, W]を求める
     W = centerPoint.W + W
@@ -209,7 +206,7 @@ def calc_circlePoint(centerPoint, circleR):
         circlePoint[i].baseAz = centerPoint.baseAz
 
         circlePoint[i].rect2sph()
-        print("circlePoint[%u]: [%f, %f,%f]" % (i, circlePoint[i].W, circlePoint[i].D, circlePoint[i].H))
+        # print("circlePoint[%u]: [%f, %f,%f]" % (i, circlePoint[i].W, circlePoint[i].D, circlePoint[i].H))
     
     return circlePoint
 
