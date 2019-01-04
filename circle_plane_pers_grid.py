@@ -173,18 +173,26 @@ def calc_circlePoint(centerPoint, circleR):
     描画の位置からEvが±90度に近いほど、あるいはD<0がある場合、描画間隔を狭める
     '''
     # 円を形成する点の数(角度)
-    circlePoint_deg = 1.0
+    circlePoint_deg = 30.0
     point_theta = np.arange(0.0, 360.1, circlePoint_deg)
 
     # vert面[W, H]に円を割り付け
     W = circleR * np.cos(np.deg2rad(point_theta))
     H = circleR * np.sin(np.deg2rad(point_theta))
+    print("vert_W:")
+    print(W)
+    print("vert_H:")
+    print(H)
 
     # vert面の円をEv分傾ける
     cntPoint_sin = np.sin(np.deg2rad(centerPoint.Ev))
     cntPoint_cos = np.cos(np.deg2rad(centerPoint.Ev))
     H = H * cntPoint_cos
     D = -1 * H * cntPoint_sin
+    print("rel_H:")
+    print(H)
+    print("rel_D:")
+    print(D)
 
     # 円の座標[D, H, W]を求める
     W = centerPoint.W + W
@@ -201,7 +209,7 @@ def calc_circlePoint(centerPoint, circleR):
         circlePoint[i].baseAz = centerPoint.baseAz
 
         circlePoint[i].rect2sph()
-        # print("circlePoint[%u][Ev]: %f" % (i, circlePoint[i].Ev))
+        print("circlePoint[%u]: [%f, %f,%f]" % (i, circlePoint[i].W, circlePoint[i].D, circlePoint[i].H))
     
     return circlePoint
 
