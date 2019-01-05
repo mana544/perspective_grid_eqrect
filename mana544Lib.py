@@ -252,29 +252,35 @@ class objectPoint:
         '''        
 
         # DとWがマイナスだったら、baseAzを90度回転させて、D, Wを再計算(プラスにする)
-        if self.D<0:
-            if self.W<0:
-                # 3象限
-                D = -1 * self.D
-                W = -1 * self.W
-                bseAz = np.mod(self.baseAz + 180.0, 360)
-            else:
-                # 4象限
-                D = self.W
-                W = -1 * self.D
-                bseAz = np.mod(self.baseAz + 90.0, 360)
-        else:
-            if self.W<0:
-                # 2象限
-                D = -1 * self.W
-                W = self.D
-                bseAz = np.mod(self.baseAz + 270.0, 360)
-            else:
-                # 1象限
-                D = self.D
-                W = self.W
-                bseAz = self.baseAz
+        # if self.D<0:
+        #     if self.W<0:
+        #         # 3象限
+        #         D = -1 * self.D
+        #         W = -1 * self.W
+        #         bseAz = np.mod(self.baseAz + 180.0, 360)
+        #     else:
+        #         # 4象限
+        #         D = self.W
+        #         W = -1 * self.D
+        #         bseAz = np.mod(self.baseAz + 90.0, 360)
+        # else:
+        #     if self.W<0:
+        #         # 2象限
+        #         D = -1 * self.W
+        #         W = self.D
+        #         bseAz = np.mod(self.baseAz + 270.0, 360)
+        #     else:
+        #         # 1象限
+        #         D = self.D
+        #         W = self.W
+        #         bseAz = self.baseAz
+        # H = self.H
+
+        self.convertDW()
+        D = self.D
         H = self.H
+        W = self.W
+        bseAz =self.baseAz
 
         # 相対方位角 + ベース方位角
         az = np.rad2deg(np.arctan(W/D)) + bseAz
@@ -369,7 +375,7 @@ if __name__ == '__main__':
     point.D = -304.338085
     point.H = -210.000000
     point.W = 22.358118
-    point.baseAz = 72.0
+    point.baseAz = 355.0
     point2 = copy.deepcopy(point)
 
     rotAz = point.convertDW()
@@ -381,8 +387,4 @@ if __name__ == '__main__':
     print("rotAz: %d"%rotAz)
 
 
-    # for i in range(0,10):
-    #     rgb = createcolor(i*2)
-    #     print("%g = " % (i,), end="")
-    #     print(rgb)
 

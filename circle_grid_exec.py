@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from PIL import Image, ImageDraw
-from mana544Lib import createcolor, listprint, heightLayer, objectPoint
-import matplotlib.pyplot as plt
+from operator import attrgetter
+from mana544Lib import createcolor, objectPoint
 
 '''
 正距円筒図法に則って、正円(同心円)を計算します。
@@ -21,30 +21,7 @@ Python(Anaconda) 3.6.4(5.1.0)
 numpy 1.14.0
 pillow 5.0.0
 
-★★★★★★★
-★ 設定値 ★
-★★★★★★★
-sphR : float
-    全天球の半径 [m](1000かけて[mm]にする)
-point_theta : list(int, ...)
-    円を描画するときの“点”を角度で指定
-circleR : tuple(float, float...)
-    円の半径 [mm]
-    タプルで複数の半径を指定すると、同心円を描画します。
-centerPoint : objectPoint
-    円の中心座標を[Az, Ev]で指定
-    .Az = 180
-    .Ev = -80
-
 '''
-# ▼▼▼ 設定値ココカラ ▼▼▼
-sphR = 1.5 * 1000
-centerPoint = objectPoint()
-centerPoint.Az = 180
-centerPoint.Ev = 60.0
-circleR = (100,200,300,400,500)
-# ▲▲▲ 設定値ココマデ ▲▲▲
-
 
 def DHW2AzEv(rect):
     """
@@ -74,28 +51,19 @@ def DHW2AzEv(rect):
     return Az,Ev
 
 
-def createImage(CP_list, drawAzEvGrid, color):
+def createImage(line_point, drawAzEvGrid, guideColor):
     """
     OPを描画してPNGファイルに保存する。
 
     Parameters
     ----------
-    wLine_Az : list(float)
-        ヨコ線用水平角のリスト
-    wLine_Ev : list(float)
-        ヨコ線用仰角のリスト
-    hLine_Az : list(float)
-        タテ線用水平角のリスト
-    hLine_Ev : list(float)
-        タテ線用仰角のリスト
-    widthCount : int
-        ヨコの個数
-    heightCount : int
-        タテの個数
-    l_heightCount : int
-        ライン描画用タテ個数
-    l_widthCount : int
-        ライン描画用ヨコ個数
+    line_point : list[(ObjectPoint, ...), ...]
+        円を形成するポイントのリスト
+    drawAzEvGrid : Boolean
+        PNG画像内に正距円筒図法の正方グリッドを描画するかどうか。
+        TrueでAz=(0, 90, 180, 270, 360), Ev=(-90, 0, 90) の位置にグレーのラインが描画されます。
+    guideColor : tuple(int, int, int)
+        描画する色
 
     Returns
     -------
@@ -129,17 +97,23 @@ def createImage(CP_list, drawAzEvGrid, color):
     # ★★★★★★★★
     # ★ 線の描画 ★
     # ★★★★★★★★
+    for i in range(len(line_point)):
+        if not guideColor:
+            # リスト番号(i)を使って色相環(h)をぐるぐる回して自動で決定
+            # 明度(v)を0.5～1に振る(徐々に明るくなる)
+            # vRange = 0.5 / len(heightList)
+            vRange = 0.5 / 1
+            meido = 0.5 + i*vRange
+            color = createcolor(i, 1, meido)
+        else:
+            color = guideColor
 
-    # CP_listの個数だけループ(描画する“点”の個数)
-    for i in range(len(CP_list)):
         # ライン描画用ポイント初期化
         P=[]
-        # 点(円)の描画ポイント個数
-        for j in range(len(CP_list[i])):
-            P.append(((x_a * CP_list[i][j].Az), (y_a * CP_list[i][j].Ev + y_b)))
+        for j in range(len(line_point[i])):
+            # 点(円)の描画ポイント個数
+            P.append(((x_a * line_point[i][j].Az), (y_a * line_point[i][j].Ev + y_b)))
 
-        # draw.polygon(P, fill=color)
-        # draw_a.polygon(P, fill=255)
         draw.line(P, fill=color, width=2)
         draw_a.line(P, fill=255, width=2)
 
@@ -150,7 +124,6 @@ def createImage(CP_list, drawAzEvGrid, color):
     filename = ("circlePersGuide.png")
     im.save(filename)
     print("%s 生成完了" % filename)
-
 
 
 def calc_circlePoint(centerPoint, circleR):
@@ -171,7 +144,7 @@ def calc_circlePoint(centerPoint, circleR):
     """
     # 円を形成する点の数(角度)
     circlePoint_deg = 1.0
-    point_theta = np.arange(0.0, 360.1, circlePoint_deg)
+    point_theta = np.arange(0.0, 360.0+circlePoint_deg, circlePoint_deg)
 
     # vert面[W, H]に円を割り付け
     W = circleR * np.cos(np.deg2rad(point_theta))
@@ -208,53 +181,82 @@ def calc_circlePoint(centerPoint, circleR):
         circlePoint[i].rect2sph()
         # print("circlePoint[%u]: [%f, %f,%f]" % (i, circlePoint[i].W, circlePoint[i].D, circlePoint[i].H))
     
+    # もし Dにマイナスの値が入っていたら、
+    # circlePointリストを'Az'プロパティ昇順ソート
+    # (線描画対策)
+    if D.min() < 0:
+        circlePoint = sorted(circlePoint, key=attrgetter('Az'))
+
     return circlePoint
 
+def circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor):
+    '''
+    ★★★★★★★★★★★★★★
+    ★ 円ガイド生成の     ★
+    ★ エントリーポイント ★
+    ★★★★★★★★★★★★★★
+
+    sphR : float
+        全天球の半径 [mm]([m]にしたほうがいいよ。1000かける)
+    centerPoint : objectPoint
+        円の中心座標を[Az, Ev]で指定
+        .Az = 180
+        .Ev = -80
+    circleR : tuple(float, float...)
+        円の半径 [mm]
+        タプルで複数の半径を指定すると、同心円を描画します。
+    drawAzEvGrid : Boolean
+        PNG画像内に正距円筒図法の正方グリッドを描画するかどうか。
+        TrueでAz=(0, 90, 180, 270, 360), Ev=(-90, 0, 90) の位置にグレーのラインが描画されます。
+    guideColor : tuple(int, int, int)
+        パースガイドの色をRGB値で指定。
+        空tupleを指定すると、パースガイドの色を自動で決定します。
+    '''
+    # ▼▼▼ 設定値ココカラ ▼▼▼
+    # sphR = 1.5 * 1000
+    # centerPoint = objectPoint()
+    # centerPoint.Az = 180
+    # centerPoint.Ev = -80.0
+    # circleR = (264, 266,)
+    # drawAzEvGrid = True
+    # guideColor = (0, 0, 0)
+    # ▲▲▲ 設定値ココマデ ▲▲▲
+
+    # centerPoint.AzをbaseAzとして[D, H, W]を計算
+    centerPoint.baseAz = centerPoint.Az
+    centerPoint.D = sphR * np.cos(np.deg2rad(centerPoint.Ev))
+    centerPoint.H = sphR * np.sin(np.deg2rad(centerPoint.Ev))
+    centerPoint.W = 0.0
+    print("centerPoint: [%.2f, %.2f, %.2f]" % (centerPoint.D, centerPoint.H, centerPoint.W))
+
+    '''
+    line_point =[ (objPoint, objPoint, ...), ... ]
+                   ~~~~~~~~    ← [j]
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~ ← [i]
+                  ↑一本の線を定義 : line_point[i]
+    '''
+    line_point =[]
+    for i in range(len(circleR)):
+        CP = tuple(calc_circlePoint(centerPoint, circleR[i]))
+
+        # 円のポイント計算した結果を
+        # リストに追加
+        line_point.append(CP)
+
+        print("circle_R: %.f" % (circleR[i]))
+
+    # 円を描画
+    createImage(line_point, drawAzEvGrid, guideColor)
+    print("処理が全部終わりました。")
 
 
+sphR = 1.5 * 1000
+centerPoint = objectPoint()
+centerPoint.Az = 180
+centerPoint.Ev = -80.0
+circleR = (264, 266,)
+drawAzEvGrid = True
+guideColor = (0, 0, 0)
 
-
-'''
-★★★★★★
-★ main ★
-★★★★★★
-'''
-# centerPoint.AzをbaseAzとして[D, H, W]を計算
-centerPoint.baseAz = centerPoint.Az
-centerPoint.D = sphR * np.cos(np.deg2rad(centerPoint.Ev))
-centerPoint.H = sphR * np.sin(np.deg2rad(centerPoint.Ev))
-centerPoint.W = 0.0
-print("centerPoint: [%.2f, %.2f, %.2f]" % (centerPoint.D, centerPoint.H, centerPoint.W))
-
-
-CP_list = []
-for i in range(len(circleR)):
-    CP_list.append(calc_circlePoint(centerPoint, circleR[i]))
-    # 座標変換とリストの作成
-    p_Az, p_Ev = DHW2AzEv(CP_list[i])
-
-    print("p_Az: ", end="")
-    listprint(p_Az, ".1f")
-    print("")   # 改行
-    print("p_Ev: ", end="")
-    listprint(p_Ev, ".1f")
-    print("")   # 改行
-'''
-CP_list : ((objectPoint, ...), ...)
-    円のリスト。
-
-
-'''
-
-# createImage(CP_list, drawAzEvGrid, color)
-createImage(CP_list, True, (0,0,0))
-
-# 計算結果をささっと確認用(matplotlib使用)
-# plt.plot(p_Az,p_Ev,'-')
-# plt.ylim(-90, 90)
-# plt.yticks(range(-90,100,30))
-# plt.xlim(0, 360)
-# plt.xticks(range(0,361,90))
-# plt.show()
-
+circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor)
 
