@@ -39,14 +39,8 @@ groundH : float
     SP～地面の高さ
 '''
 # ▼▼▼ 設定値ココカラ ▼▼▼
-sunPoint = objectPoint()
-sunPoint.Az = 342
-sunPoint.Ev = 60
-OP = objectPoint()
-OP.baseAz = 0
-OP.D = 50
-OP.H = -180
-OP.W = 0
+sunPoint = objectPoint(Az=342, Ev=80)
+OP = objectPoint(D=100, H=-60, W=0, baseAz=0)
 groundH = -210
 # ▲▲▲ 設定値ココマデ ▲▲▲
 
@@ -97,5 +91,3 @@ print("影Point[Az, Ev]: [%f, %f]" % (kagePoint.Az, kagePoint.Ev))
 # plt.xlim(0, 360)
 # plt.xticks(range(0,361,90))
 # plt.show()
-
-
