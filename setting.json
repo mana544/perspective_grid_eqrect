@@ -27,5 +27,14 @@
         "chkVal_drawAzEvGrid": false,
         "chkVal_guideColor": true,
         "btn_color": "#000000"
+    },
+    "circle_grid": {
+        "txt_sphR": "1500",
+        "txt_cirCtrAz": "180",
+        "txt_cirCtrEv": "70.0",
+        "txt_cirR": "10, 100, 500, 1000",
+        "chkVal_drawAzEvGrid": true,
+        "chkVal_guideColor": false,
+        "btn_color": "#000000"
     }
 }

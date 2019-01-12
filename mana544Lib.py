@@ -15,6 +15,7 @@ def saveSetting(section, setting):
         何のセクションを読み取るか？
         水平パースガイド生成 : 'horz_plane_pers_grid'
         垂直パースガイド生成 : 'vert_plane_pers_grid'
+        円ガイド生成 : 'circle_grid'
 
     setting : dict
         設定情報。
@@ -43,6 +44,7 @@ def loadSetting(section):
         何のセクションを読み取るか？
         水平パースガイド生成 : 'horz_plane_pers_grid'
         垂直パースガイド生成 : 'vert_plane_pers_grid'
+        円ガイド生成 : 'circle_grid'
 
     Returns
     -------
@@ -187,28 +189,56 @@ class objectPoint:
     Attributes
     ----------
     Az : float
-        方位角
+        方位角[度]
+        0 <= Az < 360 で指定。
     Ev : float
-        仰角
+        仰角[度]
+        -90 < Ev < 90 で指定。
     D : float
-        奥行
+        奥行。単位は任意(ただしH, Wと合わせる必要あり)
     H : float
-        高さ
+        高さ。単位は任意(ただしD, Wと合わせる必要あり)
     W : float
-        横幅
+        横幅。単位は任意(ただしD, Hと合わせる必要あり)
     baseAz : float
-        [D, H, W]座標計算の起点となる方位角
+        [D, H, W]座標計算の起点となる方位角[度]
+        0 <= baseAz < 360 で指定。
+
+    インスタンス生成時(コンストラクタ)に指定可能な引数
+    ----------
+    **kwargs : key = val 形式
+        keyで指定したクラス属性をvalで初期化します。
+        キーワード指定しなかった属性はnp.nanで初期化されます。
+        key : ['Az', 'Ev', 'D', 'H', 'W', 'baseAz']
+        val : float
     """
 
+    def __init__(self, **kwargs):
+        """
+        コンストラクタ定義
 
-
-    def __init__(self):
+        parameters
+        ----------
+        **kwargs : key = val 形式
+            keyのクラス属性をvalで初期化します。
+            キーワード指定しなかった属性はnp.nanで初期化されます。
+            key = ['Az', 'Ev', 'D', 'H', 'W', 'baseAz']
+            val : float
+        """
+        # 初期値のデフォルトはnan
         self.Az = np.nan
         self.Ev = np.nan
         self.D = np.nan
         self.H = np.nan
         self.W = np.nan
         self.baseAz = np.nan
+        
+        # オブジェクト生成時にキーワード指定された属性は
+        # 指定値で初期化する
+        # ただし、値がfloat変換できなかったらエラーを返す
+        for a in self.__dict__.keys():
+            if a in kwargs:
+                setattr(self, a, float(kwargs[a]))
 
 
     def rotateDW(self, rotAz):
@@ -237,7 +267,6 @@ class objectPoint:
         self.W = W
         self.baseAz = bseAz
 
-
     def rect2sph(self):
         '''
         インスタンスの直交座標系(D, H, W)&baseAzから
@@ -249,52 +278,22 @@ class objectPoint:
 
         Returns
         -------
-        '''        
+        '''
 
-        # DとWがマイナスだったら、baseAzを90度回転させて、D, Wを再計算(プラスにする)
-        # if self.D<0:
-        #     if self.W<0:
-        #         # 3象限
-        #         D = -1 * self.D
-        #         W = -1 * self.W
-        #         bseAz = np.mod(self.baseAz + 180.0, 360)
-        #     else:
-        #         # 4象限
-        #         D = self.W
-        #         W = -1 * self.D
-        #         bseAz = np.mod(self.baseAz + 90.0, 360)
-        # else:
-        #     if self.W<0:
-        #         # 2象限
-        #         D = -1 * self.W
-        #         W = self.D
-        #         bseAz = np.mod(self.baseAz + 270.0, 360)
-        #     else:
-        #         # 1象限
-        #         D = self.D
-        #         W = self.W
-        #         bseAz = self.baseAz
-        # H = self.H
-
+        # DとWがマイナスだったら、再計算(プラスにする)
         self.convertDW()
-        D = self.D
-        H = self.H
-        W = self.W
-        bseAz =self.baseAz
 
         # 相対方位角 + ベース方位角
-        az = np.rad2deg(np.arctan(W/D)) + bseAz
+        az = np.rad2deg(np.arctan(self.W/self.D)) + self.baseAz
 
         # 斜辺
-        hyp = np.sqrt(D**2 + W**2)
+        hyp = np.sqrt(self.D**2 + self.W**2)
 
         # 仰角
-        ev = np.rad2deg(np.arctan(H/hyp))
+        ev = np.rad2deg(np.arctan(self.H/hyp))
 
         self.Az = az
         self.Ev = ev
-
-
 
     def convertDW(self):
         '''
@@ -327,7 +326,6 @@ class objectPoint:
                 rotAz = 0
         self.rotateDW(rotAz)
         return rotAz
-
 
     def DHW2DHW(self, bseAz):
         '''
@@ -363,28 +361,25 @@ class objectPoint:
         self.D = D_new
         self.W = W_new
         self.baseAz = bseAz
-        
-        
-
-
 
 
 if __name__ == '__main__':
+    D = 411.5568
+    H = -150
+    W = 21.5688
+    baseAz = 232.0
 
-    point = objectPoint()
-    point.D = -304.338085
-    point.H = -210.000000
-    point.W = 22.358118
-    point.baseAz = 355.0
-    point2 = copy.deepcopy(point)
+    point = objectPoint(D=D,H=H,W=W,baseAz=baseAz)
+    point2 = objectPoint(D=D,H=H,W=W,baseAz=baseAz)
 
-    rotAz = point.convertDW()
+    point2.DHW2DHW(240)
 
-    print("point[D, H, W] = [%f, %f, %f]" % (point.D, point.H, point.W))
-    print("point.baseAz = %f" % (point.baseAz,))
-    print("point2[D, H, W] = [%f, %f, %f]" % (point2.D, point2.H, point2.W))
-    print("point2.baseAz = %f" % (point2.baseAz,))
-    print("rotAz: %d"%rotAz)
+    point2.rect2sph()
+    point.rect2sph()
 
+    print("元point[D, H, W] = [%f, %f, %f]" % (point.D, point.H, point.W))
+    print("元point.baseAz = %f" % (point.baseAz,))
+    print("回転後point[D, H, W] = [%f, %f, %f]" % (point2.D, point2.H, point2.W))
+    print("回転後point.baseAz = %f" % (point2.baseAz,))
 
 

@@ -149,20 +149,12 @@ def calc_circlePoint(centerPoint, circleR):
     # vert面[W, H]に円を割り付け
     W = circleR * np.cos(np.deg2rad(point_theta))
     H = circleR * np.sin(np.deg2rad(point_theta))
-    # print("vert_W:")
-    # print(W)
-    # print("vert_H:")
-    # print(H)
 
     # vert面の円をEv分傾ける
     cntPoint_sin = np.sin(np.deg2rad(centerPoint.Ev))
     cntPoint_cos = np.cos(np.deg2rad(centerPoint.Ev))
     D = -1 * H * cntPoint_sin
     H = H * cntPoint_cos
-    # print("rel_H:")
-    # print(H)
-    # print("rel_D:")
-    # print(D)
 
     # 円の座標[D, H, W]を求める
     W = centerPoint.W + W
@@ -172,12 +164,12 @@ def calc_circlePoint(centerPoint, circleR):
     # point_thetaの数だけcirclePoint(objectPointクラスのリスト)を作る
     circlePoint = []
     for i in range(0,len(point_theta)):
-        circlePoint.append(objectPoint())
-        circlePoint[i].W = W[i]
-        circlePoint[i].D = D[i]
-        circlePoint[i].H = H[i]
-        circlePoint[i].baseAz = centerPoint.baseAz
-
+        circlePoint.append(
+            objectPoint(
+                W=W[i], 
+                D=D[i],
+                H=H[i],
+                baseAz=centerPoint.baseAz))
         circlePoint[i].rect2sph()
         # print("circlePoint[%u]: [%f, %f,%f]" % (i, circlePoint[i].W, circlePoint[i].D, circlePoint[i].H))
     
@@ -248,15 +240,4 @@ def circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor):
     # 円を描画
     createImage(line_point, drawAzEvGrid, guideColor)
     print("処理が全部終わりました。")
-
-
-sphR = 1.5 * 1000
-centerPoint = objectPoint()
-centerPoint.Az = 180
-centerPoint.Ev = -80.0
-circleR = (264, 266,)
-drawAzEvGrid = True
-guideColor = (0, 0, 0)
-
-circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor)
 
