@@ -384,5 +384,9 @@ if __name__ == '__main__':
     point.rect2sph()
     print("point[Az, Ev] = [%f, %f]" % (point.Az, point.Ev))
 
+    print("元point[D, H, W] = [%f, %f, %f]" % (point.D, point.H, point.W))
+    print("元point.baseAz = %f" % (point.baseAz,))
+    print("回転後point[D, H, W] = [%f, %f, %f]" % (point2.D, point2.H, point2.W))
+    print("回転後point.baseAz = %f" % (point2.baseAz,))
 
 
