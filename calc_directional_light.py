@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from PIL import Image, ImageDraw
-from mana544Lib import createcolor, listprint, heightLayer, objectPoint, jdgAzRange
-import matplotlib.pyplot as plt
+from mana544Lib import objectPoint
 import copy
 
 '''
@@ -20,74 +18,82 @@ docstringを頼りに、Pythonコードを解析できる人のみ利用して�
 【動作環境(使用モジュール)】
 Python(Anaconda) 3.6.4(5.1.0)
 numpy 1.14.0
-pillow 5.0.0
-
-★★★★★★★
-★ 設定値 ★
-★★★★★★★
-sunPoint : objectPoint
-    太陽の座標を[Az, Ev]で指定
-    .Az
-    .Ev
-OP : objectPoint
-    影の計算の起点となるポイントを[D, H, W]&baseAzで指定
-    OP.D
-    OP.H
-    OP.W
-    OP.baseAz
-groundH : float
-    SP～地面の高さ
-'''
-# ▼▼▼ 設定値ココカラ ▼▼▼
-sunPoint = objectPoint(Az=342, Ev=80)
-OP = objectPoint(D=100, H=-60, W=0, baseAz=0)
-groundH = -210
-# ▲▲▲ 設定値ココマデ ▲▲▲
 
 '''
-★★★★★★
-★ main ★
-★★★★★★
-'''
-print("OP: [%f, %f, %f]" % (OP.D, OP.H, OP.W))
-print("OP.baseAz: %f" % (OP.baseAz,))
+
+def calc_shadow_point(sunPoint, OP, groundH):
+    '''
+    影のできるポイントを返す
+    
+    Parameters
+    ----------
+    sunPoint : ObjectPoint
+        太陽の位置を sunPoint.Az, sunPoint.Ev で指定
+
+    OP : ObjectPoint
+        影計算の対象となるオブジェクトポイントを
+        OP.D, OP.H, OP.W, OP.baseAz で指定。
+    groundH : float
+        SP～地面の高さ。
+        SPより地面が下にある場合(普通はこの場合が多い)はマイナスで指定。
+
+    Returns
+    -------
+    shadowPoint : ObjectPoint
+        sunPointとOPによって、groundHにできる影のポイント。
+        .D
+        .H  groundHと同じ
+        .W
+        .baseAz  OP.baseAzと同じ
+        .Az
+        .Ev
+    '''
+    # print("OP: [%f, %f, %f]" % (OP.D, OP.H, OP.W))
+    # print("OP.baseAz: %f" % (OP.baseAz,))
+
+    # 仮baseAz
+    # 太陽のAzから+90°(太陽を左側に)
+    kari_baseAz = np.mod((sunPoint.Az + 90),360)
+    # print("仮baseAz: %f" % (kari_baseAz))
+
+    # 仮baseAzで考える(OPのほうは書き換えない)
+    kari_OP = copy.deepcopy(OP)
+    kari_OP.DHW2DHW(kari_baseAz)
+    # print("仮OP: [%f, %f, %f]" % (kari_OP.D, kari_OP.H, kari_OP.W))
+    # print("仮OP.baseAz: %f" % (kari_OP.baseAz,))
+
+    kagePoint = objectPoint()
+    kagePoint.baseAz = kari_baseAz
+    # 影PointのHはgroundと同じ
+    kagePoint.H = groundH
+    # 影PointのDはkari_OP.Dと同じ
+    kagePoint.D = kari_OP.D
+    OP_groundH = np.abs(groundH - kari_OP.H)
+    # print("OP-地面 距離: %f" % (OP_groundH,))
+
+    kagePoint.W = OP_groundH / np.tan(np.deg2rad(sunPoint.Ev)) + kari_OP.W
+    # print("影Point: [%f, %f, %f]" % (kagePoint.D, kagePoint.H, kagePoint.W))
+    # print("影Point.baseAz: %f" % (kagePoint.baseAz,))
+
+    kagePoint.DHW2DHW(OP.baseAz)
+    kagePoint.rect2sph()
+    # print("影Point: [%f, %f, %f]" % (kagePoint.D, kagePoint.H, kagePoint.W))
+    # print("影Point.baseAz: %f" % (kagePoint.baseAz,))
+    # print("影Point[Az, Ev]: [%f, %f]" % (kagePoint.Az, kagePoint.Ev))
+    return kagePoint
 
 
-# 仮baseAz
-# 太陽のAzから+90°(太陽を左側に)
-kari_baseAz = np.mod((sunPoint.Az + 90),360)
-print("仮baseAz: %f" % (kari_baseAz))
+if __name__ == '__main__':
+    # ▼▼▼ 設定値ココカラ ▼▼▼
+    sunPoint = objectPoint(Az=342, Ev=80)
+    OP = objectPoint(D=100, H=-60, W=0, baseAz=0)
+    groundH = -210
+    # ▲▲▲ 設定値ココマデ ▲▲▲
 
-# 仮baseAzで考える(OPのほうは書き換えない)
-kari_OP = copy.deepcopy(OP)
-kari_OP.DHW2DHW(kari_baseAz)
-print("仮OP: [%f, %f, %f]" % (kari_OP.D, kari_OP.H, kari_OP.W))
-print("仮OP.baseAz: %f" % (kari_OP.baseAz,))
+    SP = calc_shadow_point(sunPoint, OP, groundH)
 
+    print("影Point")
+    print("[D, H, W] = [%f, %f, %f]" % (SP.D, SP.H, SP.W))
+    print("baseAz    =  %f" % (SP.baseAz,))
+    print("[Az, Ev]  = [%f, %f]" % (SP.Az, SP.Ev))
 
-kagePoint = objectPoint()
-kagePoint.baseAz = kari_baseAz
-# 影PointのHはgroundと同じ
-kagePoint.H = groundH
-# 影PointのDはkari_OP.Dと同じ
-kagePoint.D = kari_OP.D
-OP_groundH = np.abs(groundH - kari_OP.H)
-print("OP-地面 距離: %f" % (OP_groundH,))
-
-kagePoint.W = OP_groundH / np.tan(np.deg2rad(sunPoint.Ev)) + kari_OP.W
-print("影Point: [%f, %f, %f]" % (kagePoint.D, kagePoint.H, kagePoint.W))
-print("影Point.baseAz: %f" % (kagePoint.baseAz,))
-
-kagePoint.DHW2DHW(OP.baseAz)
-print("影Point: [%f, %f, %f]" % (kagePoint.D, kagePoint.H, kagePoint.W))
-print("影Point.baseAz: %f" % (kagePoint.baseAz,))
-kagePoint.rect2sph()
-print("影Point[Az, Ev]: [%f, %f]" % (kagePoint.Az, kagePoint.Ev))
-
-# 計算結果をささっと確認用(matplotlib使用)
-# plt.plot(p_Az,p_Ev,'-')
-# plt.ylim(-90, 90)
-# plt.yticks(range(-90,100,30))
-# plt.xlim(0, 360)
-# plt.xticks(range(0,361,90))
-# plt.show()

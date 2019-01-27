@@ -364,29 +364,4 @@ class objectPoint:
 
 
 if __name__ == '__main__':
-    D = 411.5568
-    H = -150
-    W = 21.5688
-    baseAz = 232.0
-
-    point = objectPoint(D=D,H=H,W=W,baseAz=baseAz)
-    print("元point[D, H, W] = [%f, %f, %f]" % (point.D, point.H, point.W))
-    print("元point.baseAz = %f" % (point.baseAz,))
-    point.rect2sph()
-    print("point[Az, Ev] = [%f, %f]" % (point.Az, point.Ev))
-    print("*************************")
-    new_baseAz = 90
-    point.DHW2DHW(new_baseAz)
-    print("new_baseAz = %f" % (new_baseAz,))
-    print("point[D, H, W] = [%f, %f, %f]" % (point.D, point.H, point.W))
-    print("point.baseAz = %f" % (point.baseAz,))
-
-    point.rect2sph()
-    print("point[Az, Ev] = [%f, %f]" % (point.Az, point.Ev))
-
-    print("元point[D, H, W] = [%f, %f, %f]" % (point.D, point.H, point.W))
-    print("元point.baseAz = %f" % (point.baseAz,))
-    print("回転後point[D, H, W] = [%f, %f, %f]" % (point2.D, point2.H, point2.W))
-    print("回転後point.baseAz = %f" % (point2.baseAz,))
-
-
+    print("END")
