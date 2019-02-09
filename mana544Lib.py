@@ -16,6 +16,7 @@ def saveSetting(section, setting):
         水平パースガイド生成 : 'horz_plane_pers_grid'
         垂直パースガイド生成 : 'vert_plane_pers_grid'
         円ガイド生成 : 'circle_grid'
+        太陽光(平行光源)の影計算 : 'calc_directional_light'
 
     setting : dict
         設定情報。
@@ -45,6 +46,7 @@ def loadSetting(section):
         水平パースガイド生成 : 'horz_plane_pers_grid'
         垂直パースガイド生成 : 'vert_plane_pers_grid'
         円ガイド生成 : 'circle_grid'
+        太陽光(平行光源)の影計算 : 'calc_directional_light'
 
     Returns
     -------

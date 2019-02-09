@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from mana544Lib import objectPoint
+from mana544Lib import objectPoint, loadSetting, saveSetting
 import copy
+import tkinter
+from tkinter import ttk
+from tkinter import messagebox
 
 '''
-太陽光によってできる影(平行光源)を計算します。
+太陽光(平行光源)によってできる、OPから地面に落ちる影の点を計算します。
+SUN PositionよりもOPのEvが上にあると、地面に影が落ちないのでエラーとなります。
 【注意】
 このプログラムはそもそも展開用に書いたものではないので、ドキュメント等
 はありません(書く予定もありません)。従って、備忘録的に書いた各関数の
@@ -18,12 +22,13 @@ docstringを頼りに、Pythonコードを解析できる人のみ利用して�
 【動作環境(使用モジュール)】
 Python(Anaconda) 3.6.4(5.1.0)
 numpy 1.14.0
+tkinter
 
 '''
 
 def calc_shadow_point(sunPoint, OP, groundH):
     '''
-    影のできるポイントを返す
+    影のできるポイントを計算して返す
     
     Parameters
     ----------
@@ -82,18 +87,169 @@ def calc_shadow_point(sunPoint, OP, groundH):
     # print("影Point[Az, Ev]: [%f, %f]" % (kagePoint.Az, kagePoint.Ev))
     return kagePoint
 
+# ★★★★★★★★★
+# ★ アクション ★
+# ★★★★★★★★★
+# 「設定値保存」ボタン
+def btn_saveSetting_action():
+        # 保存するjsonセクションと設定値dictを定義
+        section="calc_directional_light"
+        setting = {'txt_sunPtAz': txt_sunPtAz.get(),        # String
+                   'txt_sunPtEv': txt_sunPtEv.get(),        # String
+                   'txt_objPtBseAz': txt_objPtBseAz.get(),  # String
+                   'txt_objPtD': txt_objPtD.get(),          # String
+                   'txt_objPtH': txt_objPtH.get(),          # String
+                   'txt_objPtW': txt_objPtW.get(),          # String
+                   'txt_groundH': txt_groundH.get()}        # String
+        saveSetting(section, setting)
+        print("設定値を保存しました。")
+        messagebox.showinfo('設定値保存','設定値を保存しました。')
+
+# 影の計算 実行
+def btn_execute_action(event):
+        # GUIインプット情報から数値変換
+        # SUN Point(Az, Ev)
+        sunPoint = objectPoint(
+            Az=float(txt_sunPtAz.get()), 
+            Ev=float(txt_sunPtEv.get())
+            )
+        # Object Point(BaseAz, D, H, W)
+        OP = objectPoint(
+            D=float(txt_objPtD.get()), 
+            H=float(txt_objPtH.get()), 
+            W=float(txt_objPtW.get()), 
+            baseAz=float(txt_objPtBseAz.get())
+            )
+        # Ground H
+        groundH = float(txt_groundH.get())
+
+        # 影Pointの計算
+        SP = calc_shadow_point(sunPoint, OP, groundH)
+
+        # 影Pointの値からフォーマット幅を決定
+        # 最大の整数ケタ数 + 3(ドット + 小数点以下1ケタ + 符号)
+        b = np.max(np.ceil(np.log10(np.abs(
+            [SP.baseAz, SP.D, SP.H, SP.W, SP.Az, SP.Ev]
+            )))) + 3
+        strfmt = '%% %.0f.1f' % (b, )
+
+        print("***** Shadow Point *****")
+        stg = 'baseAz    =  %s' % (strfmt, )
+        print(stg % (SP.baseAz,))
+        stg = '[D, H, W] = [%s %s %s]' % (strfmt, strfmt, strfmt, )
+        print(stg % (SP.D, SP.H, SP.W))
+        stg = '[Az, Ev]  = [%s %s]\n' % (strfmt, strfmt, )
+        print(stg % (SP.Az, SP.Ev))
+
 
 if __name__ == '__main__':
-    # ▼▼▼ 設定値ココカラ ▼▼▼
-    sunPoint = objectPoint(Az=342, Ev=80)
-    OP = objectPoint(D=100, H=-60, W=0, baseAz=0)
-    groundH = -210
-    # ▲▲▲ 設定値ココマデ ▲▲▲
 
-    SP = calc_shadow_point(sunPoint, OP, groundH)
+    # メインウインドウ生成
+    root = tkinter.Tk()
+    root.title(u"太陽光(平行光源)の影計算")
+    # root.geometry("300x400")
+    root.resizable(False,False)     #ウィンドウサイズ変更の禁止　(x,y)・・・False：禁止　True：許可
+    frm = ttk.Frame(root)
+    frm.grid(column=0, row=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
 
-    print("影Point")
-    print("[D, H, W] = [%f, %f, %f]" % (SP.D, SP.H, SP.W))
-    print("baseAz    =  %f" % (SP.baseAz,))
-    print("[Az, Ev]  = [%f, %f]" % (SP.Az, SP.Ev))
+    # 初期設定値をsetting.jsonから読み込む
+    setting = loadSetting('calc_directional_light')
 
+    # ★★★★★★★★★
+    # ★ 子フレーム ★
+    # ★★★★★★★★★
+    # SUN Point(Az, Ev)用コンテナ
+    sunPtFrm = ttk.Frame(frm)
+    # Object Point(Base Az)用コンテナ
+    objPtFrm1 = ttk.Frame(frm)
+    # Object Point(D, H, W)用コンテナ
+    objPtFrm2 = ttk.Frame(frm)
+
+    # ★★★★★★★★★★★★★★★
+    # ★ スタティックテキスト ★
+    # ★★★★★★★★★★★★★★★
+    Static01 = ttk.Label(frm, text=u'太陽光(平行光源)の影計算', justify='left', padding='2')
+
+    Static02 = ttk.Label(frm, text=u'SUN Position :', justify='left', padding='2')
+    Static03 = ttk.Label(sunPtFrm, text=u'Az', justify='left', padding='2')
+    Static04 = ttk.Label(sunPtFrm, text=u'Ev', justify='left', padding='2')
+
+    Static05 = ttk.Label(frm, text=u'Object Point :', justify='left', padding='2')
+    Static06 = ttk.Label(objPtFrm1, text=u'BaseAz', justify='left', padding='2')
+    Static07 = ttk.Label(objPtFrm2, text=u'D', justify='left', padding='2')
+    Static08 = ttk.Label(objPtFrm2, text=u'H', justify='left', padding='2')
+    Static09 = ttk.Label(objPtFrm2, text=u'W', justify='left', padding='2')
+
+    Static10 = ttk.Label(frm, text=u'Ground H :', justify='left', padding='2')
+
+    # ★★★★★★★★★★★★★★
+    # ★ インプットテキスト ★
+    # ★★★★★★★★★★★★★★
+    txtVal_sunPtAz = tkinter.StringVar()
+    txtVal_sunPtEv = tkinter.StringVar()
+    txtVal_objPtBseAz = tkinter.StringVar()
+    txtVal_objPtD = tkinter.StringVar()
+    txtVal_objPtH = tkinter.StringVar()
+    txtVal_objPtW = tkinter.StringVar()
+    txtVal_groundH = tkinter.StringVar()
+
+    txtVal_sunPtAz.set(setting['txt_sunPtAz'])
+    txtVal_sunPtEv.set(setting['txt_sunPtEv'])
+    txtVal_objPtBseAz.set(setting['txt_objPtBseAz'])
+    txtVal_objPtD.set(setting['txt_objPtD'])
+    txtVal_objPtH.set(setting['txt_objPtH'])
+    txtVal_objPtW.set(setting['txt_objPtW'])
+    txtVal_groundH.set(setting['txt_groundH'])
+
+    txt_sunPtAz = ttk.Entry(sunPtFrm, width=6, justify='left', textvariable=txtVal_sunPtAz)
+    txt_sunPtEv = ttk.Entry(sunPtFrm, width=6, justify='left', textvariable=txtVal_sunPtEv)
+
+    txt_objPtBseAz = ttk.Entry(objPtFrm1, width=10, justify='left', textvariable=txtVal_objPtBseAz)
+    txt_objPtD = ttk.Entry(objPtFrm2, width=6, justify='left', textvariable=txtVal_objPtD)
+    txt_objPtH = ttk.Entry(objPtFrm2, width=6, justify='left', textvariable=txtVal_objPtH)
+    txt_objPtW = ttk.Entry(objPtFrm2, width=6, justify='left', textvariable=txtVal_objPtW)
+
+    txt_groundH = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_groundH)
+
+    # ★★★★★★★
+    # ★ ボタン ★
+    # ★★★★★★★
+    btn_execute = ttk.Button(frm, text=u'影の計算')
+    btn_saveSetting = ttk.Button(frm, text=u'設定値保存', command=btn_saveSetting_action)
+
+    # ★★★★★★★★
+    # ★ イベント ★
+    # ★★★★★★★★
+    btn_execute.bind("<ButtonRelease-1>", btn_execute_action) 
+
+    # ★★★★★★★★★
+    # ★ レイアウト ★
+    # ★★★★★★★★★
+    sunPtFrm.grid(row=1, column=1, sticky='W')
+    objPtFrm1.grid(row=2, column=1, sticky='W')
+    objPtFrm2.grid(row=3, column=1, sticky='W')
+
+    Static01.grid(row=0, column=0, columnspan=2, sticky='W')
+    Static02.grid(row=1, column=0, sticky='W')
+    Static03.grid(row=0, column=0, sticky='W')
+    Static04.grid(row=0, column=2, sticky='W')
+    Static05.grid(row=2, column=0, sticky='W')
+    Static06.grid(row=0, column=0, sticky='W')
+    Static07.grid(row=0, column=0, sticky='W')
+    Static08.grid(row=0, column=2, sticky='W')
+    Static09.grid(row=0, column=4, sticky='W')
+    Static10.grid(row=4, column=0, sticky='W')
+
+    txt_sunPtAz.grid(row=0, column=1, sticky='W')
+    txt_sunPtEv.grid(row=0, column=3, sticky='W')
+    txt_objPtBseAz.grid(row=0, column=1, sticky='W')
+    txt_objPtD.grid(row=0, column=1, sticky='W')
+    txt_objPtH.grid(row=0, column=3, sticky='W')
+    txt_objPtW.grid(row=0, column=5, sticky='W')
+    txt_groundH.grid(row=4, column=1, sticky='W')
+
+    btn_execute.grid(row=6, column=0, columnspan=2, sticky='E')
+    btn_saveSetting.grid(row=5, column=0, columnspan=2, sticky='W')
+
+    root.mainloop()
+    
