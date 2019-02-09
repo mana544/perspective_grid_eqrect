@@ -36,5 +36,14 @@
         "chkVal_drawAzEvGrid": true,
         "chkVal_guideColor": false,
         "btn_color": "#000000"
+    },
+    "calc_directional_light": {
+        "txt_sunPtAz": "0.0",
+        "txt_sunPtEv": "50.0",
+        "txt_objPtBseAz": "350.0",
+        "txt_objPtD": "100.0",
+        "txt_objPtH": "0.0",
+        "txt_objPtW": "0.0",
+        "txt_groundH": "-150.0"
     }
 }
