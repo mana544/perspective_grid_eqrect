@@ -130,7 +130,7 @@ def makeVertGridPoint(bseObjPoint, widthDivision, widthCount, heightDivision, he
             rectList.append([D,H,W])
     return rectList
 
-def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateCount, l_tateCount, l_yokoCount, drawObjPoint, drawAzEvGrid, color):
+def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateCount, l_tateCount, l_yokoCount, drawObjPoint, drawAzEvGrid, color, imageSize):
     """
     OPを描画してPNGファイル("_tmp.png")に保存する。
 
@@ -164,7 +164,7 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
     なし
     """
     # 画像のサイズ(width, height)
-    imageSize = (5376, 2688)
+    # imageSize = (5376, 2688)
 
     # Az が 360 を越えているかどうか検証
     az_range_over = False
@@ -373,7 +373,7 @@ def DHW2AzEv(rect,bseAz=0.0):
 
     return Az,Ev
 
-def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, color):
+def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, color, imageSize):
     """
     水平面のパースガイド生成
 
@@ -432,7 +432,7 @@ def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, dep
     hl_Az, hl_Ev = DHW2AzEv(hl_rectList,bseAz)
 
     # 座標変換の結果をプロットして画像保存(pillow使用)
-    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, depthCount, l_depthCount, l_widthCount, drawObjPoint, drawAzEvGrid, color)
+    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, depthCount, l_depthCount, l_widthCount, drawObjPoint, drawAzEvGrid, color, imageSize)
     # ファイル名リネーム
     filename = ("horzPersGuide(%g).png" % bseObjPoint[1])
     # ファイルが既に存在する場合は消してからリネーム
@@ -440,7 +440,7 @@ def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, dep
         os.remove(filename)
     os.rename('_tmp.png', filename)
 
-def horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, heightList, drawObjPoint, drawAzEvGrid, guideColor):
+def horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, heightList, drawObjPoint, drawAzEvGrid, guideColor, imageSize):
     '''
     ★★★★★★★★★★★★★★
     ★ 水平パース面生成の ★
@@ -529,11 +529,11 @@ def horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDiv
         # baseOPのHeightをオーバーライド
         bseObjPoint[1] = layer_list[i].height
         # パースガイド生成
-        horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, layer_list[i].color)
+        horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, layer_list[i].color, imageSize)
 
     print("処理が全部終わりました。")
 
-def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color):
+def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color, imageSize):
     '''
     垂直面のパースガイド生成
 
@@ -595,7 +595,7 @@ def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivis
     hl_Az, hl_Ev = DHW2AzEv(hl_rectList,bseAz)
 
     # 座標変換の結果をプロットして画像保存(pillow使用)
-    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, heightCount, l_heightCount, l_widthCount, drawObjPoint, drawAzEvGrid, color)
+    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, heightCount, l_heightCount, l_widthCount, drawObjPoint, drawAzEvGrid, color, imageSize)
     # ファイル名リネーム
     filename = ("vertPersGuide(%g).png" % bseObjPoint[0])
     # ファイルが既に存在する場合は消してからリネーム
@@ -603,7 +603,7 @@ def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivis
         os.remove(filename)
     os.rename('_tmp.png', filename)
 
-def vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, guideColor):
+def vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, guideColor, imageSize):
     '''
     ★★★★★★★★★★★★★★
     ★ 垂直パース面生成の ★
@@ -682,5 +682,5 @@ def vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, h
     print("***********************************************")
     print("depth=%g, color=" % (bseObjPoint[0]), end="")
     print(color)
-    vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color)
+    vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color, imageSize)
     print("処理が全部終わりました。")

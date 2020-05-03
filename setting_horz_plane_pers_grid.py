@@ -32,6 +32,8 @@ def btn_saveSetting_action():
                    'txt_widthCnt': txt_widthCnt.get(),  # String
                    'txt_depthDiv': txt_depthDiv.get(),  # String
                    'txt_depthCnt': txt_depthCnt.get(),  # String
+                   'txt_imgSizH': txt_imgSizH.get(),  # String
+                   'txt_imgSizW': txt_imgSizW.get(),  # String
                    'chkVal_drawObjPoint': chkVal_drawObjPoint.get(),    # Boolean
                    'chkVal_drawAzEvGrid': chkVal_drawAzEvGrid.get(),    # Boolean
                    'chkVal_guideColor': chkVal_guideColor.get(),        # Boolean
@@ -61,6 +63,7 @@ def btn_execute_action(event):
         widthCount = int(txt_widthCnt.get())
         depthDivision = float(txt_depthDiv.get())
         depthCount = int(txt_depthCnt.get())
+        imageSize = (int(txtVal_imgSizW.get()), int(txtVal_imgSizH.get()))
 
         # チェックボックスモノは
         # BooleanVarオブジェクトからgetして
@@ -78,8 +81,15 @@ def btn_execute_action(event):
         else:
                 # 空のタプル
                 guideColor = ()
-        
-        pers_grid_exec.horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, heightList, drawObjPoint, drawAzEvGrid, guideColor)
+
+        # imageSizeのタテヨコ比を検証
+        rto = imageSize[0] / imageSize[1]
+        print('出力画像サイズ: W:{}, H:{}, Ratio:{}'.format(imageSize[0], imageSize[1], rto))
+        if rto != 2:
+                messagebox.showerror('縦横比エラー','出力画像サイズの縦横比は必ず「W:H = 2:1」にしてください。')
+                return
+
+        pers_grid_exec.horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, heightList, drawObjPoint, drawAzEvGrid, guideColor, imageSize)
         # print(guideColor)
         # print(heightList)
         # print(type(heightList))
@@ -129,6 +139,9 @@ Static07 = ttk.Label(frm, text=u'Width Division', justify='left')
 Static08 = ttk.Label(frm, text=u'Width Count', justify='left')
 Static09 = ttk.Label(frm, text=u'Depth Division', justify='left')
 Static10 = ttk.Label(frm, text=u'Depth Count', justify='left')
+Static11 = ttk.Label(frm, text=u'出力画像サイズ(Pixcel)', justify='left')
+Static12 = ttk.Label(frm, text=u'W', justify='left')
+Static13 = ttk.Label(frm, text=u'H', justify='left')
 
 # ★★★★★★★★★★★★★★
 # ★ インプットテキスト ★
@@ -141,6 +154,9 @@ txtVal_widthDiv = tkinter.StringVar()
 txtVal_widthCnt = tkinter.StringVar()
 txtVal_depthDiv = tkinter.StringVar()
 txtVal_depthCnt = tkinter.StringVar()
+txtVal_imgSizW = tkinter.StringVar()
+txtVal_imgSizH = tkinter.StringVar()
+
 txtVal_baseAz.set(setting['txt_baseAz'])
 txtVal_D.set(setting['txt_D'])
 txtVal_W.set(setting['txt_W'])
@@ -149,6 +165,8 @@ txtVal_widthDiv.set(setting['txt_widthDiv'])
 txtVal_widthCnt.set(setting['txt_widthCnt'])
 txtVal_depthDiv.set(setting['txt_depthDiv'])
 txtVal_depthCnt.set(setting['txt_depthCnt'])
+txtVal_imgSizW.set(setting['txt_imgSizW'])
+txtVal_imgSizH.set(setting['txt_imgSizH'])
 
 txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
 txt_D = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_D)
@@ -158,6 +176,9 @@ txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widt
 txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
 txt_depthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_depthDiv)
 txt_depthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_depthCnt)
+txt_imgSizW = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_imgSizW)
+txt_imgSizH = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_imgSizH)
+
 
 # ★★★★★★★★★★★★★
 # ★ チェックボックス ★
@@ -212,8 +233,13 @@ chk_drawObjPoint.grid(row=9, column=0, columnspan=5, sticky='W')
 chk_drawAzEvGrid.grid(row=10, column=0, columnspan=5, sticky='W')
 chk_guideColor.grid(row=11, column=0, columnspan=4, sticky='W')
 btn_color.grid(row=11, column=4, sticky='W')
-btn_execute.grid(row=13, column=0, columnspan=5, sticky='E')
-btn_saveSetting.grid(row=12, column=0, columnspan=5, sticky='W')
+Static11.grid(row=12, column=0, columnspan=5, sticky='W')
+Static12.grid(row=13, column=1, sticky='W')
+txt_imgSizW.grid(row=13, column=2, sticky='W')
+Static13.grid(row=13, column=3, sticky='W')
+txt_imgSizH.grid(row=13, column=4, sticky='W')
+btn_execute.grid(row=15, column=0, columnspan=5, sticky='E')
+btn_saveSetting.grid(row=14, column=0, columnspan=5, sticky='W')
 
 
 # ★★★★★★★
