@@ -130,7 +130,7 @@ def makeVertGridPoint(bseObjPoint, widthDivision, widthCount, heightDivision, he
             rectList.append([D,H,W])
     return rectList
 
-def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateCount, l_tateCount, l_yokoCount, drawObjPoint, drawAzEvGrid, color):
+def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateCount, l_tateCount, l_yokoCount, drawObjPoint, drawAzEvGrid, color, imageSize):
     """
     OPを描画してPNGファイル("_tmp.png")に保存する。
 
@@ -164,7 +164,20 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
     なし
     """
     # 画像のサイズ(width, height)
-    imageSize = (5376, 2688)
+    # imageSize = (5376, 2688)
+
+    # Az が 360 を越えているかどうか検証
+    az_range_over = False
+    # Az が 0 を下回っているかどうか検証
+    az_range_under = False
+    for a in Az:
+        if a < 0:
+            az_range_under = True
+            break
+        elif a >= 360:
+            az_range_over = True
+            break
+
     # 90°のピクセル数
     gridDivision = imageSize[0]/4
     grid = [[gridDivision, 0, gridDivision, gridDivision*2],
@@ -204,7 +217,27 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
             draw.ellipse(P, fill=color)
             draw_a.ellipse(P, fill=255)
 
+        # 0 < Az < 360 の範囲外に計算が及んでいる場合は、
+        # 一周分(360deg)送ってコピー
+        if az_range_over:
+            for i in range(len(Az)):
+                P = ((x_a * (Az[i] - 360)) - size/2,
+                    (y_a * Ev[i] + y_b) - size/2,
+                    (x_a * (Az[i] - 360)) + size/2,
+                    (y_a * Ev[i] + y_b) + size/2)
 
+                draw.ellipse(P, fill=color)
+                draw_a.ellipse(P, fill=255)
+        elif az_range_under:
+            for i in range(len(Az)):
+                P = ((x_a * (Az[i] + 360)) - size/2,
+                    (y_a * Ev[i] + y_b) - size/2,
+                    (x_a * (Az[i] + 360)) + size/2,
+                    (y_a * Ev[i] + y_b) + size/2)
+
+                draw.ellipse(P, fill=color)
+                draw_a.ellipse(P, fill=255)
+                
     # ★★★★★★★★★★
     # ★ ヨコ線の描画 ★
     # ★★★★★★★★★★
@@ -218,8 +251,42 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
         for j in range(l_yokoCount):
             k = i * l_yokoCount + j
             P.append(((x_a*wLine_Az[k]), (y_a*wLine_Ev[k]+y_b)))
+
         draw.line(P, fill=color, width=3)
         draw_a.line(P, fill=255, width=3)
+
+    # ★★★★★★★★★★
+    # ★ ヨコ線の描画 (0 < Az < 360 の範囲を超えている場合) ★
+    # ★★★★★★★★★★
+    # 0 < Az < 360 の範囲外に計算が及んでいる場合は、一周分(360deg)送ってラインコピー
+    if az_range_over:
+        for i in range(tateCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_yokoCount):
+                k = i * l_yokoCount + j
+                P.append(((x_a * (wLine_Az[k] - 360)), (y_a * wLine_Ev[k]+y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
+
+    elif az_range_under:
+        for i in range(tateCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_yokoCount):
+                k = i * l_yokoCount + j
+                P.append(((x_a * (wLine_Az[k] + 360)), (y_a * wLine_Ev[k]+y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
+
 
     # ★★★★★★★★★★
     # ★ タテ線の描画 ★
@@ -237,6 +304,38 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
 
         draw.line(P, fill=color, width=3)
         draw_a.line(P, fill=255, width=3)
+
+    # ★★★★★★★★★★
+    # ★ タテ線の描画 (0 < Az < 360 の範囲を超えている場合) ★
+    # ★★★★★★★★★★
+    # 0 < Az < 360 の範囲外に計算が及んでいる場合は、一周分(360deg)送ってラインコピー
+    if az_range_over:
+        for i in range(yokoCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_tateCount):
+                k = i  + j * yokoCount
+                P.append(((x_a * (hLine_Az[k] - 360)), (y_a * hLine_Ev[k] + y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
+
+    elif az_range_under:
+        for i in range(yokoCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_tateCount):
+                k = i  + j * yokoCount
+                P.append(((x_a * (hLine_Az[k] + 360)), (y_a * hLine_Ev[k] + y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
 
     # アルファチャンネル埋め込み
     im.putalpha(im_a)
@@ -274,7 +373,7 @@ def DHW2AzEv(rect,bseAz=0.0):
 
     return Az,Ev
 
-def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, color):
+def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, color, imageSize):
     """
     水平面のパースガイド生成
 
@@ -333,7 +432,7 @@ def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, dep
     hl_Az, hl_Ev = DHW2AzEv(hl_rectList,bseAz)
 
     # 座標変換の結果をプロットして画像保存(pillow使用)
-    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, depthCount, l_depthCount, l_widthCount, drawObjPoint, drawAzEvGrid, color)
+    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, depthCount, l_depthCount, l_widthCount, drawObjPoint, drawAzEvGrid, color, imageSize)
     # ファイル名リネーム
     filename = ("horzPersGuide(%g).png" % bseObjPoint[1])
     # ファイルが既に存在する場合は消してからリネーム
@@ -341,7 +440,7 @@ def horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, dep
         os.remove(filename)
     os.rename('_tmp.png', filename)
 
-def horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, heightList, drawObjPoint, drawAzEvGrid, guideColor):
+def horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, heightList, drawObjPoint, drawAzEvGrid, guideColor, imageSize):
     '''
     ★★★★★★★★★★★★★★
     ★ 水平パース面生成の ★
@@ -430,11 +529,11 @@ def horz_plane_pers_grid(bseAz, bseObjPoint, widthDivision, widthCount, depthDiv
         # baseOPのHeightをオーバーライド
         bseObjPoint[1] = layer_list[i].height
         # パースガイド生成
-        horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, layer_list[i].color)
+        horz_plane(bseAz, bseObjPoint, widthDivision, widthCount, depthDivision, depthCount, drawObjPoint, drawAzEvGrid, layer_list[i].color, imageSize)
 
     print("処理が全部終わりました。")
 
-def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color):
+def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color, imageSize):
     '''
     垂直面のパースガイド生成
 
@@ -496,7 +595,7 @@ def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivis
     hl_Az, hl_Ev = DHW2AzEv(hl_rectList,bseAz)
 
     # 座標変換の結果をプロットして画像保存(pillow使用)
-    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, heightCount, l_heightCount, l_widthCount, drawObjPoint, drawAzEvGrid, color)
+    createImage(p_Az, p_Ev, wl_Az, wl_Ev, hl_Az, hl_Ev, widthCount, heightCount, l_heightCount, l_widthCount, drawObjPoint, drawAzEvGrid, color, imageSize)
     # ファイル名リネーム
     filename = ("vertPersGuide(%g).png" % bseObjPoint[0])
     # ファイルが既に存在する場合は消してからリネーム
@@ -504,7 +603,7 @@ def vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivis
         os.remove(filename)
     os.rename('_tmp.png', filename)
 
-def vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, guideColor):
+def vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, guideColor, imageSize):
     '''
     ★★★★★★★★★★★★★★
     ★ 垂直パース面生成の ★
@@ -583,5 +682,5 @@ def vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, h
     print("***********************************************")
     print("depth=%g, color=" % (bseObjPoint[0]), end="")
     print(color)
-    vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color)
+    vert_plane(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, color, imageSize)
     print("処理が全部終わりました。")
