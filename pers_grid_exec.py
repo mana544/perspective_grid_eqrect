@@ -165,6 +165,19 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
     """
     # 画像のサイズ(width, height)
     imageSize = (5376, 2688)
+
+    # Az が 360 を越えているかどうか検証
+    az_range_over = False
+    # Az が 0 を下回っているかどうか検証
+    az_range_under = False
+    for a in Az:
+        if a < 0:
+            az_range_under = True
+            break
+        elif a >= 360:
+            az_range_over = True
+            break
+
     # 90°のピクセル数
     gridDivision = imageSize[0]/4
     grid = [[gridDivision, 0, gridDivision, gridDivision*2],
@@ -204,7 +217,27 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
             draw.ellipse(P, fill=color)
             draw_a.ellipse(P, fill=255)
 
+        # 0 < Az < 360 の範囲外に計算が及んでいる場合は、
+        # 一周分(360deg)送ってコピー
+        if az_range_over:
+            for i in range(len(Az)):
+                P = ((x_a * (Az[i] - 360)) - size/2,
+                    (y_a * Ev[i] + y_b) - size/2,
+                    (x_a * (Az[i] - 360)) + size/2,
+                    (y_a * Ev[i] + y_b) + size/2)
 
+                draw.ellipse(P, fill=color)
+                draw_a.ellipse(P, fill=255)
+        elif az_range_under:
+            for i in range(len(Az)):
+                P = ((x_a * (Az[i] + 360)) - size/2,
+                    (y_a * Ev[i] + y_b) - size/2,
+                    (x_a * (Az[i] + 360)) + size/2,
+                    (y_a * Ev[i] + y_b) + size/2)
+
+                draw.ellipse(P, fill=color)
+                draw_a.ellipse(P, fill=255)
+                
     # ★★★★★★★★★★
     # ★ ヨコ線の描画 ★
     # ★★★★★★★★★★
@@ -218,8 +251,42 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
         for j in range(l_yokoCount):
             k = i * l_yokoCount + j
             P.append(((x_a*wLine_Az[k]), (y_a*wLine_Ev[k]+y_b)))
+
         draw.line(P, fill=color, width=3)
         draw_a.line(P, fill=255, width=3)
+
+    # ★★★★★★★★★★
+    # ★ ヨコ線の描画 (0 < Az < 360 の範囲を超えている場合) ★
+    # ★★★★★★★★★★
+    # 0 < Az < 360 の範囲外に計算が及んでいる場合は、一周分(360deg)送ってラインコピー
+    if az_range_over:
+        for i in range(tateCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_yokoCount):
+                k = i * l_yokoCount + j
+                P.append(((x_a * (wLine_Az[k] - 360)), (y_a * wLine_Ev[k]+y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
+
+    elif az_range_under:
+        for i in range(tateCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_yokoCount):
+                k = i * l_yokoCount + j
+                P.append(((x_a * (wLine_Az[k] + 360)), (y_a * wLine_Ev[k]+y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
+
 
     # ★★★★★★★★★★
     # ★ タテ線の描画 ★
@@ -237,6 +304,38 @@ def createImage(Az, Ev, wLine_Az, wLine_Ev, hLine_Az, hLine_Ev, yokoCount, tateC
 
         draw.line(P, fill=color, width=3)
         draw_a.line(P, fill=255, width=3)
+
+    # ★★★★★★★★★★
+    # ★ タテ線の描画 (0 < Az < 360 の範囲を超えている場合) ★
+    # ★★★★★★★★★★
+    # 0 < Az < 360 の範囲外に計算が及んでいる場合は、一周分(360deg)送ってラインコピー
+    if az_range_over:
+        for i in range(yokoCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_tateCount):
+                k = i  + j * yokoCount
+                P.append(((x_a * (hLine_Az[k] - 360)), (y_a * hLine_Ev[k] + y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
+
+    elif az_range_under:
+        for i in range(yokoCount):
+            # ライン描画用ポイント初期化
+            # [[x1,x2],[x1,x2],...,[xn,xn]]
+            P=[]
+
+            # 1本あたりのポイントの数
+            for j in range(l_tateCount):
+                k = i  + j * yokoCount
+                P.append(((x_a * (hLine_Az[k] + 360)), (y_a * hLine_Ev[k] + y_b)))
+
+            draw.line(P, fill=color, width=3)
+            draw_a.line(P, fill=255, width=3)
 
     # アルファチャンネル埋め込み
     im.putalpha(im_a)
