@@ -8,6 +8,7 @@ import numpy as np
 import colorsys
 import pers_grid_exec
 from mana544Lib import loadSetting, saveSetting
+from fractions import Fraction
 
 # ★★★★★★★★★
 # ★ アクション ★
@@ -71,10 +72,10 @@ def btn_execute_action(event):
                 guideColor = ()
 
         # imageSizeのタテヨコ比を検証
-        rto = imageSize[0] / imageSize[1]
-        print('出力画像サイズ: W:{}, H:{}, Ratio:{}'.format(imageSize[0], imageSize[1], rto))
-        if rto != 2:
-                messagebox.showerror('縦横比エラー','出力画像サイズの縦横比は必ず「W:H = 2:1」にしてください。')
+        rto = Fraction(imageSize[0] , imageSize[1])
+        print('出力画像サイズ(W, H)={}, Ratio={}:{}'.format(imageSize, rto.numerator, rto.denominator))
+        if (rto.numerator != 2) or (rto.denominator != 1):
+                messagebox.showerror('縦横比エラー','出力画像サイズの縦横比が{}:{}になっています。縦横比は必ず「W:H = 2:1」になるように数値設定してください。'.format(rto.numerator, rto.denominator))
                 return
 
         pers_grid_exec.vert_plane_pers_grid(bseAz, bseEv, bseObjPoint, widthDivision, widthCount, heightDivision, heightCount, drawObjPoint, drawAzEvGrid, guideColor, imageSize)
