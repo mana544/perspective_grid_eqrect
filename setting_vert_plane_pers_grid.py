@@ -117,41 +117,15 @@ frm.grid(column=0, row=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
 # 初期設定値をsetting.jsonから読み込む
 setting = loadSetting('vert_plane_pers_grid')
 
-# ★★★★★★★★★★★★
-# ★ ttkスタイル設定 ★
-# ★★★★★★★★★★★★
+################
+# ttkスタイル設定
+################
 style = ttk.Style()
 style.configure("btn_color.TButton", foreground=setting['btn_color'])
 
-# ###############
-# 小フレーム
-# ###############
-# ベースObject Point [D H W]
-bseOPFrm = ttk.Frame(frm)
-# 出力画像サイズ[W H]
-imgSzFrm = ttk.Frame(frm)
-
-# ★★★★★★★★★★★★★★★
-# ★ スタティックテキスト ★
-# ★★★★★★★★★★★★★★★
-Static01 = ttk.Label(frm, text=u'垂直パースガイド生成', justify='left', font=('',14))
-Static02 = ttk.Label(frm, text=u'ベースAz', justify='left')
-Static03 = ttk.Label(frm, text=u'ベースEv', justify='left')
-Static04 = ttk.Label(frm, text=u'ベースObject Point', justify='left')
-Static05 = ttk.Label(bseOPFrm, text=u'D', justify='left')
-Static06 = ttk.Label(bseOPFrm, text=u'H', justify='left')
-Static07 = ttk.Label(bseOPFrm, text=u'W', justify='left')
-Static08 = ttk.Label(frm, text=u'Width Division', justify='left')
-Static09 = ttk.Label(frm, text=u'Width Count', justify='left')
-Static10 = ttk.Label(frm, text=u'Height Division', justify='left')
-Static11 = ttk.Label(frm, text=u'Height Count', justify='left')
-Static12 = ttk.Label(frm, text=u'出力画像サイズ(Pixcel)', justify='left')
-Static13 = ttk.Label(imgSzFrm, text=u'W', justify='left')
-Static14 = ttk.Label(imgSzFrm, text=u'H', justify='left')
-
-# ★★★★★★★★★★★★★★
-# ★ インプットテキスト ★
-# ★★★★★★★★★★★★★★
+#######################
+# インプットテキスト格納用オブジェクト
+#######################
 txtVal_baseAz = tkinter.StringVar()
 txtVal_baseEv = tkinter.StringVar()
 txtVal_D = tkinter.StringVar()
@@ -176,48 +150,86 @@ txtVal_heightCnt.set(setting['txt_heightCnt'])
 txtVal_imgSizW.set(setting['txt_imgSizW'])
 txtVal_imgSizH.set(setting['txt_imgSizH'])
 
-txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
-txt_baseEv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseEv)
-txt_D = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_D)
-txt_H = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_H)
-txt_W = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_W)
-txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
-txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
-txt_heightDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_heightDiv)
-txt_heightCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_heightCnt)
-txt_imgSizW = ttk.Entry(imgSzFrm, width=7, justify='left', textvariable=txtVal_imgSizW)
-txt_imgSizH = ttk.Entry(imgSzFrm, width=7, justify='left', textvariable=txtVal_imgSizH)
-
-# ★★★★★★★★★★★★★
-# ★ チェックボックス ★
-# ★★★★★★★★★★★★★
-# チェックボックス用変数
+#######################
+# チェックボックス格納用オブジェクト
+#######################
 chkVal_drawObjPoint = tkinter.BooleanVar()
 chkVal_drawAzEvGrid = tkinter.BooleanVar()
 chkVal_guideColor = tkinter.BooleanVar()
+
 chkVal_drawObjPoint.set(setting['chkVal_drawObjPoint'])
 chkVal_drawAzEvGrid.set(setting['chkVal_drawAzEvGrid'])
 chkVal_guideColor.set(setting['chkVal_guideColor'])
+
+#######################
+# GUIコンポーネントの定義
+# ココでの定義順でTabフォーカスの順序が決定される
+#######################
+# タイトル text
+Static01 = ttk.Label(frm, text=u'垂直パースガイド生成', justify='left', font=('',14))
+# ベースAz text
+Static02 = ttk.Label(frm, text=u'ベースAz', justify='left')
+# ベースAz インプット
+txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
+# ベースEv text
+Static03 = ttk.Label(frm, text=u'ベースEv', justify='left')
+# ベースEv インプット
+txt_baseEv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseEv)
+# ベースObject Point text
+Static04 = ttk.Label(frm, text=u'ベースObject Point', justify='left')
+# ベースObject Point(D, H, W)
+bseOPFrm = ttk.Frame(frm)
+Static05 = ttk.Label(bseOPFrm, text=u'D', justify='left')
+txt_D = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_D)
+Static06 = ttk.Label(bseOPFrm, text=u'H', justify='left')
+txt_H = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_H)
+Static07 = ttk.Label(bseOPFrm, text=u'W', justify='left')
+txt_W = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_W)
+# Width Division text
+Static08 = ttk.Label(frm, text=u'Width Division', justify='left')
+# Width Division インプット
+txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
+# Width Count text
+Static09 = ttk.Label(frm, text=u'Width Count', justify='left')
+# Width Count インプット
+txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
+# Height Division text
+Static10 = ttk.Label(frm, text=u'Height Division', justify='left')
+# Height Division インプット
+txt_heightDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_heightDiv)
+# Height Count text
+Static11 = ttk.Label(frm, text=u'Height Count', justify='left')
+# Height Count インプット
+txt_heightCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_heightCnt)
+# OPの“点”を描画する チェックボックス
 chk_drawObjPoint = ttk.Checkbutton(frm, text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
+# 正方グリッドを描画する チェックボックス
 chk_drawAzEvGrid = ttk.Checkbutton(frm, text=u"正方グリッドを描画する" , variable=chkVal_drawAzEvGrid)
+# パースガイドの色 チェックボックス
 chk_guideColor = ttk.Checkbutton(frm, text=u"パースガイドの色" , variable=chkVal_guideColor, command=chk_guideColor_action)
-
-# ★★★★★★★
-# ★ ボタン ★
-# ★★★★★★★
+# パースガイド色設定ボタン
 btn_color = ttk.Button(frm, text=u'━━━', style='btn_color.TButton', command=btn_color_action)
-btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
+# 出力画像サイズ(W, H) インプット
+Static12 = ttk.Label(frm, text=u'出力画像サイズ(Pixcel)', justify='left')
+imgSzFrm = ttk.Frame(frm)
+Static13 = ttk.Label(imgSzFrm, text=u'W', justify='left')
+txt_imgSizW = ttk.Entry(imgSzFrm, width=7, justify='left', textvariable=txtVal_imgSizW)
+Static14 = ttk.Label(imgSzFrm, text=u'H', justify='left')
+txt_imgSizH = ttk.Entry(imgSzFrm, width=7, justify='left', textvariable=txtVal_imgSizH)
+# 設定値保存ボタン
 btn_saveSetting = ttk.Button(frm, text=u'設定値保存', command=btn_saveSetting_action)
+# パースガイド画像生成ボタン
+btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
 
-# ★★★★★★★★
-# ★ イベント ★
-# ★★★★★★★★
+#################
+# イベントバインド
+#################
 btn_execute.bind("<ButtonRelease-1>", btn_execute_action) 
 # chk_guideColor.bind("<ButtonRelease-1>", chk_guideColor_action)
 
-# ★★★★★★★★★
-# ★ レイアウト ★
-# ★★★★★★★★★
+##################
+# グリッドレイアウト
+##################
 Static01.grid(row=0, column=0, columnspan=2, sticky='W')
 Static02.grid(row=1, column=0, sticky='W')
 txt_baseAz.grid(row=1, column=1, sticky='W')

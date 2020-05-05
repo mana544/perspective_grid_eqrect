@@ -121,15 +121,15 @@ def btn_color_reDraw():
 # 初期設定値をsetting.jsonから読み込む
 setting = loadSetting('horz_plane_pers_grid')
 
-# ★★★★★★★★★★★★
-# ★ ttkスタイル設定 ★
-# ★★★★★★★★★★★★
+#######################
+# ttkスタイル設定
+#######################
 style = ttk.Style()
 style.configure("btn_color.TButton", foreground=setting['btn_color'])
 
-# ★★★★★★★★★★★★★★★
-# ★ スタティックテキスト ★
-# ★★★★★★★★★★★★★★★
+#######################
+# スタティックテキスト
+#######################
 Static01 = ttk.Label(frm, text=u'水平パースガイド生成', justify='left', font=('',14))
 Static02 = ttk.Label(frm, text=u'ベースAz', justify='left')
 Static03 = ttk.Label(frm, text=u'ベースObject Point', justify='left')
@@ -144,9 +144,9 @@ Static11 = ttk.Label(frm, text=u'出力画像サイズ(Pixcel)', justify='left')
 Static12 = ttk.Label(frm, text=u'W', justify='left')
 Static13 = ttk.Label(frm, text=u'H', justify='left')
 
-# ★★★★★★★★★★★★★★
-# ★ インプットテキスト ★
-# ★★★★★★★★★★★★★★
+#######################
+# インプットテキスト格納用オブジェクト
+#######################
 txtVal_baseAz = tkinter.StringVar()
 txtVal_D = tkinter.StringVar()
 txtVal_W = tkinter.StringVar()
@@ -169,49 +169,60 @@ txtVal_depthCnt.set(setting['txt_depthCnt'])
 txtVal_imgSizW.set(setting['txt_imgSizW'])
 txtVal_imgSizH.set(setting['txt_imgSizH'])
 
-txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
-txt_D = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_D)
-txt_W = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_W)
-txt_H = ttk.Entry(frm, width=18, justify='left', textvariable=txtVal_H)
-txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
-txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
-txt_depthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_depthDiv)
-txt_depthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_depthCnt)
-txt_imgSizW = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_imgSizW)
-txt_imgSizH = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_imgSizH)
-
-
-# ★★★★★★★★★★★★★
-# ★ チェックボックス ★
-# ★★★★★★★★★★★★★
-# チェックボックス用変数
+#######################
+# チェックボックス格納用オブジェクト
+#######################
 chkVal_drawObjPoint = tkinter.BooleanVar()
 chkVal_drawAzEvGrid = tkinter.BooleanVar()
 chkVal_guideColor = tkinter.BooleanVar()
+
 chkVal_drawObjPoint.set(setting['chkVal_drawObjPoint'])
 chkVal_drawAzEvGrid.set(setting['chkVal_drawAzEvGrid'])
 chkVal_guideColor.set(setting['chkVal_guideColor'])
-# chk_drawObjPoint = tkinter.Checkbutton(text=u"OPの“点”を描画する" , variable=Val1, state='disabled')
+
+#######################
+# GUIコンポーネントの定義
+# ココでの定義順でTabフォーカスの順序が決定される
+#######################
+# ベースAz インプット
+txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
+# Base OP(D, W, H) インプット
+txt_D = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_D)
+txt_W = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_W)
+txt_H = ttk.Entry(frm, width=18, justify='left', textvariable=txtVal_H)
+# Width Division インプット
+txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
+# Width Count インプット
+txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
+# Depth Division インプット
+txt_depthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_depthDiv)
+# Depth Count インプット
+txt_depthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_depthCnt)
+# OPの“点”を描画する チェックボックス
 chk_drawObjPoint = ttk.Checkbutton(frm, text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
+# 正方グリッドを描画する チェックボックス
 chk_drawAzEvGrid = ttk.Checkbutton(frm, text=u"正方グリッドを描画する" , variable=chkVal_drawAzEvGrid)
+# パースガイドの色 チェックボックス
 chk_guideColor = ttk.Checkbutton(frm, text=u"パースガイドの色" , variable=chkVal_guideColor, command=chk_guideColor_action)
-
-# ★★★★★★★
-# ★ ボタン ★
-# ★★★★★★★
+# パースガイド色指定ボタン
 btn_color = ttk.Button(frm, text=u'━━━', style='btn_color.TButton', command=btn_color_action)
-btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
+# 出力画像サイズ(W, H) インプット
+txt_imgSizW = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_imgSizW)
+txt_imgSizH = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_imgSizH)
+# 設定値保存ボタン
 btn_saveSetting = ttk.Button(frm, text=u'設定値保存', command=btn_saveSetting_action)
+# パースガイド画像生成ボタン
+btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
 
-# ★★★★★★★★
-# ★ イベント ★
-# ★★★★★★★★
+################
+# イベントバインド
+################
 btn_execute.bind("<ButtonRelease-1>", btn_execute_action) 
 # chk_guideColor.bind("<ButtonRelease-1>", chk_guideColor_action)
 
-# ★★★★★★★★★
-# ★ レイアウト ★
-# ★★★★★★★★★
+##################
+# グリッドレイアウト
+##################
 Static01.grid(row=0, column=0, columnspan=5, sticky='W')
 Static02.grid(row=1, column=0, sticky='W')
 Static03.grid(row=2, column=0, columnspan=5, sticky='W')
@@ -243,9 +254,9 @@ btn_execute.grid(row=15, column=0, columnspan=5, sticky='E')
 btn_saveSetting.grid(row=14, column=0, columnspan=5, sticky='W')
 
 
-# ★★★★★★★
-# ★ 再描画 ★
-# ★★★★★★★
+#########
+# 再描画
+#########
 btn_color_reDraw()
 
 
