@@ -170,37 +170,37 @@ Static01 = ttk.Label(frm, text=u'垂直パースガイド生成', justify='left'
 # ベースAz text
 Static02 = ttk.Label(frm, text=u'ベースAz', justify='left')
 # ベースAz インプット
-txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
+txt_baseAz = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_baseAz)
 # ベースEv text
 Static03 = ttk.Label(frm, text=u'ベースEv', justify='left')
 # ベースEv インプット
-txt_baseEv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseEv)
+txt_baseEv = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_baseEv)
 # ベースObject Point text
 Static04 = ttk.Label(frm, text=u'ベースObject Point', justify='left')
 # ベースObject Point(D, H, W)
 bseOPFrm = ttk.Frame(frm)
 Static05 = ttk.Label(bseOPFrm, text=u'D', justify='left')
-txt_D = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_D)
+txt_D = ttk.Entry(bseOPFrm, width=7, justify='left', textvariable=txtVal_D)
 Static06 = ttk.Label(bseOPFrm, text=u'H', justify='left')
-txt_H = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_H)
+txt_H = ttk.Entry(bseOPFrm, width=7, justify='left', textvariable=txtVal_H)
 Static07 = ttk.Label(bseOPFrm, text=u'W', justify='left')
-txt_W = ttk.Entry(bseOPFrm, width=5, justify='left', textvariable=txtVal_W)
+txt_W = ttk.Entry(bseOPFrm, width=7, justify='left', textvariable=txtVal_W)
 # Width Division text
 Static08 = ttk.Label(frm, text=u'Width Division', justify='left')
 # Width Division インプット
-txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
+txt_widthDiv = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_widthDiv)
 # Width Count text
 Static09 = ttk.Label(frm, text=u'Width Count', justify='left')
 # Width Count インプット
-txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
+txt_widthCnt = ttk.Entry(frm, width=3, justify='left', textvariable=txtVal_widthCnt)
 # Height Division text
 Static10 = ttk.Label(frm, text=u'Height Division', justify='left')
 # Height Division インプット
-txt_heightDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_heightDiv)
+txt_heightDiv = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_heightDiv)
 # Height Count text
 Static11 = ttk.Label(frm, text=u'Height Count', justify='left')
 # Height Count インプット
-txt_heightCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_heightCnt)
+txt_heightCnt = ttk.Entry(frm, width=3, justify='left', textvariable=txtVal_heightCnt)
 # OPの“点”を描画する チェックボックス
 chk_drawObjPoint = ttk.Checkbutton(frm, text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
 # 正方グリッドを描画する チェックボックス

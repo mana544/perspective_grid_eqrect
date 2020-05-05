@@ -185,19 +185,19 @@ chkVal_guideColor.set(setting['chkVal_guideColor'])
 # ココでの定義順でTabフォーカスの順序が決定される
 #######################
 # ベースAz インプット
-txt_baseAz = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_baseAz)
+txt_baseAz = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_baseAz)
 # Base OP(D, W, H) インプット
-txt_D = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_D)
-txt_W = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_W)
+txt_D = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_D)
+txt_W = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_W)
 txt_H = ttk.Entry(frm, width=18, justify='left', textvariable=txtVal_H)
 # Width Division インプット
-txt_widthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_widthDiv)
+txt_widthDiv = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_widthDiv)
 # Width Count インプット
-txt_widthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_widthCnt)
+txt_widthCnt = ttk.Entry(frm, width=3, justify='left', textvariable=txtVal_widthCnt)
 # Depth Division インプット
-txt_depthDiv = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_depthDiv)
+txt_depthDiv = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_depthDiv)
 # Depth Count インプット
-txt_depthCnt = ttk.Entry(frm, width=5, justify='left', textvariable=txtVal_depthCnt)
+txt_depthCnt = ttk.Entry(frm, width=3, justify='left', textvariable=txtVal_depthCnt)
 # OPの“点”を描画する チェックボックス
 chk_drawObjPoint = ttk.Checkbutton(frm, text=u"OPの“点”を描画する" , variable=chkVal_drawObjPoint)
 # 正方グリッドを描画する チェックボックス
