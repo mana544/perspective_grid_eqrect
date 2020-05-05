@@ -8,6 +8,7 @@ import numpy as np
 import colorsys
 from circle_grid_exec import circle_grid
 from mana544Lib import loadSetting, saveSetting, objectPoint
+from fractions import Fraction
 
 # ★★★★★★★★★
 # ★ アクション ★
@@ -20,6 +21,8 @@ def btn_saveSetting_action():
                    'txt_cirCtrAz': txt_cirCtrAz.get(),  # String
                    'txt_cirCtrEv': txt_cirCtrEv.get(),  # String
                    'txt_cirR': txt_cirR.get(),          # String
+                   'txt_imgSizW': txt_imgSizW.get(),          # String
+                   'txt_imgSizH': txt_imgSizH.get(),          # String
                    'chkVal_drawAzEvGrid': chkVal_drawAzEvGrid.get(),    # Boolean
                    'chkVal_guideColor': chkVal_guideColor.get(),        # Boolean
                    'btn_color': style.configure("btn_color.TButton")['foreground']}           # String
@@ -37,7 +40,8 @@ def btn_execute_action(event):
         centerPoint = objectPoint(
                 Az=float(txt_cirCtrAz.get()),
                 Ev=float(txt_cirCtrEv.get())
-                )
+        )
+        imageSize = (int(txtVal_imgSizW.get()), int(txtVal_imgSizH.get()))
 
         # カンマ区切りをスプリットする
         # 組み込みリスト型にはそのまま数値変換できないので
@@ -61,8 +65,16 @@ def btn_execute_action(event):
         else:
                 # 空のタプル
                 guideColor = ()
+
+        # imageSizeのタテヨコ比を検証
+        rto = Fraction(imageSize[0] , imageSize[1])
+        print('出力画像サイズ(W, H)={}, Ratio={}:{}'.format(imageSize, rto.numerator, rto.denominator))
+        if (rto.numerator != 2) or (rto.denominator != 1):
+                messagebox.showerror('縦横比エラー','出力画像サイズの縦横比が{}:{}になっています。縦横比は必ず「W:H = 2:1」になるように数値設定してください。'.format(rto.numerator, rto.denominator))
+                return
+        
         # 円ガイド生成実行
-        circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor)
+        circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor, imageSize)
 
 
 # 「パースガイドの色」チェックボックス
@@ -99,95 +111,118 @@ frm.grid(column=0, row=0, sticky=tkinter.N+tkinter.S+tkinter.E+tkinter.W)
 # 初期設定値をsetting.jsonから読み込む
 setting = loadSetting('circle_grid')
 
-# ★★★★★★★★★★★★
-# ★ ttkスタイル設定 ★
-# ★★★★★★★★★★★★
+#######################
+# ttkスタイル設定
+#######################
 style = ttk.Style()
 style.configure("btn_color.TButton", foreground=setting['btn_color'])
 
-# ★★★★★★★★★
-# ★ 子フレーム ★
-# ★★★★★★★★★
-# 円中心Point(Az, Ev)用コンテナ
-cirCtrFrm = ttk.Frame(frm)
-
-# ★★★★★★★★★★★★★★★
-# ★ スタティックテキスト ★
-# ★★★★★★★★★★★★★★★
-Static01 = ttk.Label(frm, text=u'円ガイド生成', justify='left', padding='2')
-Static02 = ttk.Label(frm, text=u'全天球半径', justify='left', padding='2')
-Static03 = ttk.Label(frm, text=u'円の中心', justify='left', padding='2')
-Static04 = ttk.Label(cirCtrFrm, text=u'Az', justify='left', padding='2')
-Static05 = ttk.Label(cirCtrFrm, text=u'Ev', justify='left', padding='2')
-Static06 = ttk.Label(frm, text=u'円半径', justify='left', padding='2')
-
-# ★★★★★★★★★★★★★★
-# ★ インプットテキスト ★
-# ★★★★★★★★★★★★★★
+#######################
+# インプットテキスト格納用オブジェクト
+#######################
 txtVal_sphR = tkinter.StringVar()
 txtVal_cirCtrAz = tkinter.StringVar()
 txtVal_cirCtrEv = tkinter.StringVar()
 txtVal_cirR = tkinter.StringVar()
+txtVal_imgSizW = tkinter.StringVar()
+txtVal_imgSizH = tkinter.StringVar()
 
 txtVal_sphR.set(setting['txt_sphR'])
 txtVal_cirCtrAz.set(setting['txt_cirCtrAz'])
 txtVal_cirCtrEv.set(setting['txt_cirCtrEv'])
 txtVal_cirR.set(setting['txt_cirR'])
+txtVal_imgSizW.set(setting['txt_imgSizW'])
+txtVal_imgSizH.set(setting['txt_imgSizH'])
 
-txt_sphR = ttk.Entry(frm, width=10, justify='left', textvariable=txtVal_sphR)
-txt_cirCtrAz = ttk.Entry(cirCtrFrm, width=5, justify='left', textvariable=txtVal_cirCtrAz)
-txt_cirCtrEv = ttk.Entry(cirCtrFrm, width=5, justify='left', textvariable=txtVal_cirCtrEv)
-txt_cirR = ttk.Entry(frm, width=18, justify='left', textvariable=txtVal_cirR)
-
-# ★★★★★★★★★★★★★
-# ★ チェックボックス ★
-# ★★★★★★★★★★★★★
-# チェックボックス用変数
+#######################
+# チェックボックス格納用オブジェクト
+#######################
 chkVal_drawAzEvGrid = tkinter.BooleanVar()
 chkVal_guideColor = tkinter.BooleanVar()
 
 chkVal_drawAzEvGrid.set(setting['chkVal_drawAzEvGrid'])
 chkVal_guideColor.set(setting['chkVal_guideColor'])
 
+#######################
+# GUIコンポーネントの定義
+# ココでの定義順でTabフォーカスの順序が決定される
+#######################
+# タイトル
+Static01 = ttk.Label(frm, text=u'円ガイド生成', justify='left', padding='2')
+# 全天球半径 text
+Static02 = ttk.Label(frm, text=u'全天球半径', justify='left', padding='2')
+# 全天球半径 インプット
+txt_sphR = ttk.Entry(frm, width=7, justify='left', textvariable=txtVal_sphR)
+# 円の中心 text
+Static03 = ttk.Label(frm, text=u'円の中心', justify='left', padding='2')
+# 円の中心(Az, Ev)
+cirCtrFrm = ttk.Frame(frm)
+Static04 = ttk.Label(cirCtrFrm, text=u'Az', justify='left', padding='2')
+txt_cirCtrAz = ttk.Entry(cirCtrFrm, width=7, justify='left', textvariable=txtVal_cirCtrAz)
+Static05 = ttk.Label(cirCtrFrm, text=u'Ev', justify='left', padding='2')
+txt_cirCtrEv = ttk.Entry(cirCtrFrm, width=7, justify='left', textvariable=txtVal_cirCtrEv)
+# 円半径 text
+Static06 = ttk.Label(frm, text=u'円半径', justify='left', padding='2')
+# 円半径 インプット
+txt_cirR = ttk.Entry(frm, width=18, justify='left', textvariable=txtVal_cirR)
+# 正方グリッドを描画する チェックボックス
 chk_drawAzEvGrid = ttk.Checkbutton(frm, text=u"正方グリッドを描画する" , variable=chkVal_drawAzEvGrid)
+# パースガイドの色 チェックボックス
 chk_guideColor = ttk.Checkbutton(frm, text=u"パースガイドの色" , variable=chkVal_guideColor, command=chk_guideColor_action)
-
-# ★★★★★★★
-# ★ ボタン ★
-# ★★★★★★★
+# パースガイド色設定ボタン
 btn_color = ttk.Button(frm, text=u'━━━', style='btn_color.TButton', command=btn_color_action)
-btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
+# 出力画像サイズ(W, H) インプット
+Static07 = ttk.Label(frm, text=u'出力画像サイズ(Pixcel)', justify='left')
+imgSzFrm = ttk.Frame(frm)
+Static08 = ttk.Label(imgSzFrm, text=u'W', justify='left')
+txt_imgSizW = ttk.Entry(imgSzFrm, width=7, justify='left', textvariable=txtVal_imgSizW)
+Static09 = ttk.Label(imgSzFrm, text=u'H', justify='left')
+txt_imgSizH = ttk.Entry(imgSzFrm, width=7, justify='left', textvariable=txtVal_imgSizH)
+# 設定値保存ボタン
 btn_saveSetting = ttk.Button(frm, text=u'設定値保存', command=btn_saveSetting_action)
+# パースガイド画像生成ボタン
+btn_execute = ttk.Button(frm, text=u'パースガイド画像生成')
 
-# ★★★★★★★★
-# ★ イベント ★
-# ★★★★★★★★
+#################
+# イベントバインド
+#################
 btn_execute.bind("<ButtonRelease-1>", btn_execute_action) 
 
-# ★★★★★★★★★
-# ★ レイアウト ★
-# ★★★★★★★★★
-cirCtrFrm.grid(row=2, column=1, sticky='W')
-
+##################
+# グリッドレイアウト
+##################
 Static01.grid(row=0, column=0, columnspan=2, sticky='W')
 Static02.grid(row=1, column=0, sticky='W')
-Static03.grid(row=2, column=0, sticky='W')
-Static06.grid(row=3, column=0, sticky='W')
-Static04.grid(row=0, column=0, sticky='W')
-Static05.grid(row=0, column=2, sticky='W')
 txt_sphR.grid(row=1, column=1, sticky='W')
+
+Static03.grid(row=2, column=0, sticky='W')
+# 円の中心小フレーム
+cirCtrFrm.grid(row=2, column=1, sticky='W')
+Static04.grid(row=0, column=0, sticky='W')
 txt_cirCtrAz.grid(row=0, column=1, sticky='W')
+Static05.grid(row=0, column=2, sticky='W')
 txt_cirCtrEv.grid(row=0, column=3, sticky='W')
+
+Static06.grid(row=3, column=0, sticky='W')
 txt_cirR.grid(row=3, column=1, sticky='W')
 chk_drawAzEvGrid.grid(row=4, column=0, columnspan=2, sticky='W')
 chk_guideColor.grid(row=5, column=0, sticky='W')
 btn_color.grid(row=5, column=1, sticky='W')
-btn_execute.grid(row=7, column=0, columnspan=2, sticky='E')
-btn_saveSetting.grid(row=6, column=0, columnspan=2, sticky='W')
 
-# ★★★★★★★
-# ★ 再描画 ★
-# ★★★★★★★
+Static07.grid(row=6, column=0, columnspan=2, sticky='W')
+# 出力画像サイズ小フレーム
+imgSzFrm.grid(row=7, column=1, sticky='W')
+Static08.grid(row=0, column=0, sticky='W')
+txt_imgSizW.grid(row=0, column=1, sticky='W')
+Static09.grid(row=0, column=2, sticky='W')
+txt_imgSizH.grid(row=0, column=3, sticky='W')
+
+btn_saveSetting.grid(row=8, column=0, columnspan=2, sticky='W')
+btn_execute.grid(row=9, column=0, columnspan=2, sticky='E')
+
+#########
+# 再描画
+#########
 btn_color_reDraw()
 
 

@@ -51,7 +51,7 @@ def DHW2AzEv(rect):
     return Az,Ev
 
 
-def createImage(line_point, drawAzEvGrid, guideColor):
+def createImage(line_point, drawAzEvGrid, guideColor, imageSize):
     """
     OPを描画してPNGファイルに保存する。
 
@@ -64,13 +64,13 @@ def createImage(line_point, drawAzEvGrid, guideColor):
         TrueでAz=(0, 90, 180, 270, 360), Ev=(-90, 0, 90) の位置にグレーのラインが描画されます。
     guideColor : tuple(int, int, int)
         描画する色
+    imageSize : tuple(int, int)
+        生成画像のサイズを(width, height)[pixcel]で指定。
 
     Returns
     -------
     なし
     """
-    # 画像のサイズ(width, height)
-    imageSize = (5376, 2688)
     gridDivision = imageSize[0]/4
     grid = [[gridDivision, 0, gridDivision, gridDivision*2],
             [gridDivision*2, 0, gridDivision*2, gridDivision*2],
@@ -180,7 +180,7 @@ def calc_circlePoint(centerPoint, circleR):
 
     return circlePoint
 
-def circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor):
+def circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor, imageSize):
     '''
     ★★★★★★★★★★★★★★
     ★ 円ガイド生成の     ★
@@ -202,6 +202,8 @@ def circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor):
     guideColor : tuple(int, int, int)
         パースガイドの色をRGB値で指定。
         空tupleを指定すると、パースガイドの色を自動で決定します。
+    imageSize : tuple(int, int)
+        生成画像のサイズを(width, height)[pixcel]で指定。
     '''
     # ▼▼▼ 設定値ココカラ ▼▼▼
     # sphR = 1.5 * 1000
@@ -237,6 +239,6 @@ def circle_grid(sphR, centerPoint, circleR, drawAzEvGrid, guideColor):
         print("circle_R: %.f" % (circleR[i]))
 
     # 円を描画
-    createImage(line_point, drawAzEvGrid, guideColor)
+    createImage(line_point, drawAzEvGrid, guideColor, imageSize)
     print("処理が全部終わりました。")
 

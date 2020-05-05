@@ -37,6 +37,8 @@
         "txt_cirCtrAz": "180",
         "txt_cirCtrEv": "70.0",
         "txt_cirR": "10, 100, 500, 1000",
+        "txt_imgSizW": "5520",
+        "txt_imgSizH": "2760",
         "chkVal_drawAzEvGrid": true,
         "chkVal_guideColor": false,
         "btn_color": "#000000"
